@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrollHandsFree - Options</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      background: #1a73e8;
+      color: white;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 32px;
+    }
+
+    .section {
+      margin-bottom: 32px;
+      padding: 24px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border-left: 4px solid #1a73e8;
+    }
+
+    .section h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #1a73e8;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .form-group input[type="number"],
+    .form-group input[type="text"],
+    .form-group select {
+      width: 100%;
+      max-width: 300px;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #1a73e8;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .help-text {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .voice-commands {
+      background: #e8f0fe;
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 16px;
+    }
+
+    .voice-commands h4 {
+      margin-bottom: 12px;
+      color: #1a73e8;
+    }
+
+    .voice-commands ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .voice-commands li {
+      padding: 4px 0;
+      border-bottom: 1px solid #dadce0;
+    }
+
+    .voice-commands li:last-child {
+      border-bottom: none;
+    }
+
+    .voice-commands .command {
+      font-family: 'Courier New', monospace;
+      background: #f1f3f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .btn:focus {
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+    }
+
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1557b0;
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #444;
+      border: 1px solid #dadce0;
+    }
+
+    .btn-secondary:hover {
+      background: #e8eaed;
+    }
+
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    /* Accessibility */
+    @media (prefers-contrast: high) {
+      body {
+        background: white;
+        color: black;
+      }
+      
+      .section {
+        background: white;
+        border: 2px solid black;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .header {
+        padding: 24px 16px;
+      }
+
+      .content {
+        padding: 24px 16px;
+      }
+
+      .section {
+        padding: 16px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ScrollHandsFree</h1>
+      <p>Configure your hands-free browsing experience</p>
+    </div>
+
+    <div class="content">
+      <form id="optionsForm">
+        <div class="section">
+          <h2>Scrolling Settings</h2>
+          
+          <div class="form-group">
+            <label for="defaultSpeed">Default Scroll Speed (pixels per second):</label>
+            <input 
+              type="number" 
+              id="defaultSpeed" 
+              min="1" 
+              max="100" 
+              value="50"
+              aria-describedby="speedHelp">
+            <div id="speedHelp" class="help-text">
+              Controls how fast the page scrolls automatically. Higher values scroll faster.
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Voice Control Settings</h2>
+          
+          <div class="form-group">
+            <label for="voiceActivationKey">Voice Control Activation Shortcut:</label>
+            <select id="voiceActivationKey" aria-describedby="keyHelp">
+              <option value="Ctrl+Shift+S">Ctrl+Shift+S</option>
+              <option value="Ctrl+Shift+V">Ctrl+Shift+V</option>
+              <option value="Alt+Shift+S">Alt+Shift+S</option>
+              <option value="Alt+Shift+V">Alt+Shift+V</option>
+            </select>
+            <div id="keyHelp" class="help-text">
+              Keyboard shortcut to quickly toggle voice control on/off.
+            </div>
+          </div>
+
+          <div class="voice-commands">
+            <h4>Supported Voice Commands:</h4>
+            <ul>
+              <li><span class="command">"start"</span> or <span class="command">"begin"</span> - Start auto-scrolling</li>
+              <li><span class="command">"stop"</span> or <span class="command">"halt"</span> - Stop auto-scrolling</li>
+              <li><span class="command">"up"</span> or <span class="command">"backward"</span> - Scroll up</li>
+              <li><span class="command">"down"</span> or <span class="command">"forward"</span> - Scroll down</li>
+              <li><span class="command">"faster"</span> or <span class="command">"slower"</span> - Adjust speed</li>
+              <li><span class="command">"turbo"</span> or <span class="command">"max speed"</span> - Maximum speed</li>
+              <li><span class="command">"top"</span> or <span class="command">"bottom"</span> - Jump to page ends</li>
+              <li><span class="command">"current speed"</span> or <span class="command">"where am I"</span> - Status info</li>
+              <li><span class="command">"help"</span> or <span class="command">"what can I say"</span> - Show all commands</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Advanced Settings</h2>
+          
+          <div class="form-group">
+            <label for="pauseAtHeadings">Pause Duration at Headings (seconds):</label>
+            <input 
+              type="number" 
+              id="pauseAtHeadings" 
+              min="0" 
+              max="10" 
+              step="0.5" 
+              value="2"
+              aria-describedby="pauseHelp">
+            <div id="pauseHelp" class="help-text">
+              How long to pause when reaching a new heading section. Set to 0 to disable.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="smartPausing">
+              <label for="smartPausing">Smart pausing at content breaks</label>
+            </div>
+            <div class="help-text">
+              Automatically pause at natural reading breaks like paragraphs and sections.
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="saveBtn">
+            Save Settings
+          </button>
+          <button type="button" class="btn btn-secondary" id="resetBtn">
+            Reset to Defaults
+          </button>
+        </div>
+
+        <div id="successMessage" class="success-message">
+          Settings saved successfully!
+        </div>
+
+        <div id="errorMessage" class="error-message">
+          Error saving settings. Please try again.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

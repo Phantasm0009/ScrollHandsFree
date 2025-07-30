@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrollHandsFree</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      height: 400px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #333;
+      background: #ffffff;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a73e8;
+      margin-bottom: 4px;
+    }
+
+    .header .status {
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .status.active {
+      color: #34a853;
+    }
+
+    .status.inactive {
+      color: #ea4335;
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .control-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    button:focus {
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+    }
+
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1557b0;
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #444;
+      border: 1px solid #dadce0;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #e8eaed;
+    }
+
+    .btn-danger {
+      background: #ea4335;
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #d33b2c;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .slider-container label {
+      margin: 0;
+      min-width: 50px;
+      font-size: 13px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1a73e8;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1a73e8;
+      cursor: pointer;
+      border: none;
+    }
+
+    .speed-value {
+      min-width: 35px;
+      text-align: center;
+      font-weight: 600;
+      color: #1a73e8;
+    }
+
+    .feature-toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      position: relative;
+    }
+
+    .toggle-item label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .help-btn {
+      position: absolute;
+      right: -30px;
+      width: 20px;
+      height: 20px;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      background: #f8f9fa;
+      color: #666;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .help-btn:hover {
+      background: #1a73e8;
+      color: white;
+      border-color: #1a73e8;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-switch.active {
+      background: #1a73e8;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+
+    .accessibility-section {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+
+    .accessibility-section h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    .accessibility-button {
+      width: 100%;
+      padding: 8px 12px;
+      background: #34a853;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .accessibility-button:hover {
+      background: #2d8f47;
+    }
+
+    .accessibility-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .footer a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      body {
+        background: white;
+        color: black;
+      }
+      
+      button {
+        border: 2px solid black;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>ScrollHandsFree</h1>
+    <div id="statusDisplay" class="status inactive">Ready</div>
+  </div>
+
+  <div class="button-row">
+    <button 
+      id="startBtn" 
+      class="btn-primary" 
+      aria-label="Start auto-scrolling"
+      title="Start automatic scrolling">
+      Start
+    </button>
+    <button 
+      id="stopBtn" 
+      class="btn-danger" 
+      aria-label="Stop auto-scrolling"
+      title="Stop automatic scrolling"
+      disabled>
+      Stop
+    </button>
+  </div>
+
+  <div class="button-row">
+    <button 
+      id="scrollUpBtn" 
+      class="btn-secondary" 
+      aria-label="Scroll up"
+      title="Start scrolling upward">
+      ↑ Up
+    </button>
+    <button 
+      id="scrollDownBtn" 
+      class="btn-secondary" 
+      aria-label="Scroll down"
+      title="Start scrolling downward">
+      ↓ Down
+    </button>
+  </div>
+
+  <div class="control-group">
+    <div class="slider-container">
+      <label for="speedSlider">Speed:</label>
+      <input 
+        type="range" 
+        id="speedSlider" 
+        min="1" 
+        max="100" 
+        value="50"
+        aria-label="Scroll speed"
+        title="Adjust scrolling speed (1-100 pixels per second)">
+      <span id="speedValue" class="speed-value">50</span>
+    </div>
+  </div>
+
+  <div class="feature-toggles">
+    <div class="toggle-item">
+      <label for="voiceToggle">Voice Control</label>
+      <div 
+        id="voiceToggle" 
+        class="toggle-switch" 
+        role="switch" 
+        aria-checked="false"
+        aria-label="Toggle voice control"
+        tabindex="0">
+      </div>
+      <button id="helpBtn" class="help-btn" title="Show voice commands on page">
+        ?
+      </button>
+    </div>
+  </div>
+
+  <div class="accessibility-section">
+    <h3>Accessibility</h3>
+    <button 
+      id="accessibilityBtn" 
+      class="accessibility-button"
+      aria-label="Check page accessibility"
+      title="Run accessibility check on current page">
+      Check Page Accessibility
+    </button>
+  </div>
+
+  <div class="footer">
+    <a href="#" id="optionsLink" title="Open extension options">Options</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
