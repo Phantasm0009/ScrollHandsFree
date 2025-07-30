@@ -1,7 +1,7 @@
 # ScrollHands Free Chrome Extension
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-blue.svg)](https://chrome.google.com/webstore/detail/scrollhands-free-auto-scro/nffjcdkomkhlgldfbgpinmlahkgnnmpb)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-blue.svg)](https://chromewebstore.google.com/detail/scrollhandsfree/pnaepegbhjnpjkemebdecmfjikpagpji)
 
 A lightweight Chrome extension that provides hands-free browsing through auto-scrolling and voice commands. Perfect for accessibility, reading long articles, or when your hands are busy.
 
