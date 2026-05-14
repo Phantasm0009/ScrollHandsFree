@@ -13,7 +13,7 @@
   let voiceTestPhrase, voiceTestBtn, voiceTestResult;
   let currentSiteLabel, siteBlocked, siteSpeed, siteFocusBandEnabled, siteHudEnabled, importExportBox, diagnosticsBox;
   let usageCountersSummary;
-  let saveSiteBtn, resetSiteBtn, exportSettingsBtn, importSettingsBtn, clearPositionsBtn, clearAllBtn, diagnosticsBtn;
+  let saveSiteBtn, resetSiteBtn, exportSettingsBtn, importSettingsBtn, clearPositionsBtn, clearAllBtn, diagnosticsBtn, shortcutsBtn;
   let currentSite = '';
 
   // Default settings
@@ -43,6 +43,7 @@
     try {
       initializeDOMElements();
       setupEventListeners();
+      showSection('generalSection');
       loadSettings();
       console.log('ScrollHands Free options page initialized');
     } catch (error) {
@@ -104,6 +105,7 @@
     clearPositionsBtn = document.getElementById('clearPositionsBtn');
     clearAllBtn = document.getElementById('clearAllBtn');
     diagnosticsBtn = document.getElementById('diagnosticsBtn');
+    shortcutsBtn = document.getElementById('shortcutsBtn');
 
     if (!optionsForm || !saveBtn || !resetBtn || !defaultSpeed || !pauseAtHeadings || !smartPausing || !autoPauseOnUserScroll || !endBehavior || !voiceLanguage || !focusBandEnabled || !defaultDirection || !hudEnabled || !focusBandHeight || !focusDimOpacity || !readingRhythm) {
       throw new Error('Required DOM elements not found');
@@ -123,6 +125,7 @@
     clearPositionsBtn?.addEventListener('click', () => handleClearLocalData(['positions']));
     clearAllBtn?.addEventListener('click', () => handleClearLocalData(['settings', 'sites', 'positions', 'aliases', 'counters']));
     diagnosticsBtn?.addEventListener('click', handleDiagnostics);
+    shortcutsBtn?.addEventListener('click', handleOpenShortcuts);
     voiceTestBtn?.addEventListener('click', handleVoiceCommandTest);
     document.querySelectorAll('[data-section-target]').forEach((button) => {
       button.addEventListener('click', () => showSection(button.dataset.sectionTarget));
@@ -279,16 +282,22 @@
     let isValid = true;
 
     // Validate speed
-    if (!validateSpeed()) {
+    if (!validateSpeed(false)) {
+      showSection('generalSection');
+      validateSpeed(true);
       isValid = false;
     }
 
     // Validate pause duration
-    if (!validatePauseDuration()) {
+    if (!validatePauseDuration(false)) {
+      showSection('generalSection');
+      validatePauseDuration(true);
       isValid = false;
     }
 
-    if (!validateFocusSettings()) {
+    if (!validateFocusSettings(false)) {
+      showSection('focusSection');
+      validateFocusSettings(true);
       isValid = false;
     }
 
@@ -298,12 +307,14 @@
   /**
    * Validate speed input
    */
-  function validateSpeed() {
+  function validateSpeed(report = true) {
     const speed = parseInt(defaultSpeed.value, 10);
-    
+
     if (isNaN(speed) || speed < 1 || speed > 100) {
       defaultSpeed.setCustomValidity('Speed must be between 1 and 100');
-      defaultSpeed.reportValidity();
+      if (report) {
+        defaultSpeed.reportValidity();
+      }
       return false;
     }
     
@@ -314,12 +325,14 @@
   /**
    * Validate pause duration input
    */
-  function validatePauseDuration() {
+  function validatePauseDuration(report = true) {
     const duration = parseFloat(pauseAtHeadings.value);
-    
+
     if (isNaN(duration) || duration < 0 || duration > 10) {
       pauseAtHeadings.setCustomValidity('Pause duration must be between 0 and 10 seconds');
-      pauseAtHeadings.reportValidity();
+      if (report) {
+        pauseAtHeadings.reportValidity();
+      }
       return false;
     }
     
@@ -327,17 +340,21 @@
     return true;
   }
 
-  function validateFocusSettings() {
+  function validateFocusSettings(report = true) {
     const height = parseFloat(focusBandHeight.value);
     const opacity = parseFloat(focusDimOpacity.value);
     if (isNaN(height) || height < 12 || height > 60) {
       focusBandHeight.setCustomValidity('Band height must be between 12 and 60');
-      focusBandHeight.reportValidity();
+      if (report) {
+        focusBandHeight.reportValidity();
+      }
       return false;
     }
     if (isNaN(opacity) || opacity < 0 || opacity > 0.35) {
       focusDimOpacity.setCustomValidity('Dim opacity must be between 0 and 0.35');
-      focusDimOpacity.reportValidity();
+      if (report) {
+        focusDimOpacity.reportValidity();
+      }
       return false;
     }
     focusBandHeight.setCustomValidity('');
@@ -454,11 +471,20 @@
   }
 
   function showSection(sectionId) {
+    const activeSectionId = sectionId || 'generalSection';
     document.querySelectorAll('[data-options-section]').forEach((section) => {
-      section.hidden = section.id !== sectionId;
+      const isActive = section.id === activeSectionId;
+      section.hidden = !isActive;
+      setSectionInteractivity(section, isActive);
     });
     document.querySelectorAll('[data-section-target]').forEach((button) => {
-      button.classList.toggle('active', button.dataset.sectionTarget === sectionId);
+      button.classList.toggle('active', button.dataset.sectionTarget === activeSectionId);
+    });
+  }
+
+  function setSectionInteractivity(section, isActive) {
+    section.querySelectorAll('input, select, textarea, button').forEach((control) => {
+      control.disabled = !isActive;
     });
   }
 
@@ -576,6 +602,36 @@
       }
     } else {
       showErrorMessage(response?.error || 'Could not get diagnostics.');
+    }
+  }
+
+  async function handleOpenShortcuts() {
+    const shortcutsUrl = 'chrome://extensions/shortcuts';
+
+    try {
+      if (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.create === 'function') {
+        await new Promise((resolve, reject) => {
+          chrome.tabs.create({ url: shortcutsUrl }, () => {
+            const lastError = chrome.runtime?.lastError;
+            if (lastError) {
+              reject(new Error(lastError.message));
+              return;
+            }
+            resolve();
+          });
+        });
+        showSuccessMessage('Opened Chrome shortcut settings.');
+        return;
+      }
+    } catch (error) {
+      console.warn('Could not open Chrome shortcut settings directly:', error);
+    }
+
+    try {
+      await navigator.clipboard.writeText(shortcutsUrl);
+      showSuccessMessage('Copied chrome://extensions/shortcuts. Paste it in the address bar.');
+    } catch (error) {
+      showErrorMessage('Open chrome://extensions/shortcuts from the address bar.');
     }
   }
 

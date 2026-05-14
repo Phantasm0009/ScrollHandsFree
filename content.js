@@ -2499,6 +2499,8 @@
         const speechError = event.error || 'unknown';
         if (speechError === 'aborted') {
           console.log('Speech recognition aborted');
+        } else if (speechError === 'no-speech') {
+          console.log('No speech detected, continuing to listen...');
         } else {
           console.error('Speech recognition error:', speechError);
         }
@@ -2506,7 +2508,6 @@
         // Handle specific errors gracefully
         switch (speechError) {
           case 'no-speech':
-            console.log('No speech detected, continuing to listen...');
             break;
           case 'audio-capture':
             console.error('Microphone access denied or unavailable');
