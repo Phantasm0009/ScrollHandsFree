@@ -2,7 +2,7 @@
 
 ## Overview
 
-ScrollHands Free now supports voice commands in **16 different languages**, making it accessible to users worldwide. The extension automatically detects your browser's language and responds to voice commands in that language, while also providing fallback support for all other languages.
+ScrollHandsFree includes multilingual command dictionaries for common scrolling actions. Voice recognition quality still depends on the browser's Web Speech implementation, microphone permission, selected language, accent, and network/platform behavior. Do not describe this as guaranteed 16-language support in store copy unless you have tested the languages you advertise.
 
 ## Supported Languages
 
@@ -27,20 +27,20 @@ ScrollHands Free now supports voice commands in **16 different languages**, maki
 
 ## How It Works
 
-### 1. Automatic Language Detection
+### 1. Language Selection
 ```javascript
-// The extension detects your browser's language
-const detectedLanguage = navigator.language.split('-')[0]; // e.g., 'en', 'es', 'fr'
+// The extension can use browser auto-detection or a user-selected language.
+recognition.lang = selectedVoiceLanguage; // e.g., 'en-US', 'es-ES', 'fr-FR'
 ```
 
 ### 2. Smart Pattern Matching
-- Commands are matched first in your detected language
-- If no match is found, all languages are tried as fallback
+- Commands are matched first in the active language
+- If no match is found, other command dictionaries can be tried as fallback
 - Both exact word matching and partial inclusion are supported
 
 ### 3. Fallback System
-- If you speak in a different language than your browser setting, it still works
-- All 16 languages are checked for every command
+- If you speak in a different language than the active setting, some aliases may still match
+- Fallback improves resilience, but browser recognition still works best when the selected language matches the spoken language
 - Natural variations and synonyms are supported
 
 ## Available Commands
@@ -57,7 +57,7 @@ const detectedLanguage = navigator.language.split('-')[0]; // e.g., 'en', 'es', 
 |--------------|---------|---------|--------|--------|---------|
 | **Faster** | faster, speed up, quicker | más rápido, acelerar | plus vite, accélérer | schneller, beschleunigen | Increase scroll speed |
 | **Slower** | slower, slow down | más lento, desacelerar | plus lent, ralentir | langsamer, verlangsamen | Decrease scroll speed |
-| **Turbo** | turbo, maximum speed | turbo, velocidad máxima | turbo, vitesse maximum | turbo, höchste geschwindigkeit | Set to maximum speed |
+| **Max speed** | max speed, turbo, maximum speed | velocidad máxima | vitesse maximum | höchste geschwindigkeit | Set to maximum speed |
 
 ### Navigation Commands
 | Command Type | English | Spanish | French | German | Purpose |
@@ -140,7 +140,7 @@ const languageToUse = supportedLanguages.includes(detectedLanguage) ? detectedLa
 ### Pattern Matching Algorithm
 1. **Normalize** the spoken command (lowercase, trim)
 2. **Try detected language first** for better performance
-3. **Fallback to all languages** if no match found
+3. **Fallback to other dictionaries** if no match found
 4. **Use both word boundary and inclusion matching** for flexibility
 5. **Execute the first matching command**
 
@@ -168,7 +168,7 @@ window.isRecognizableCommand("开始");     // Chinese "start"
 ## Browser Compatibility
 
 ### Speech Recognition Support
-- **Chrome/Edge**: Full support for all languages
+- **Chrome/Edge**: Best supported, but recognition quality varies by language and platform
 - **Firefox**: Limited support, may require enabling flags
 - **Safari**: Partial support on macOS
 
@@ -180,8 +180,8 @@ window.isRecognizableCommand("开始");     // Chinese "start"
 ## Accessibility Features
 
 ### Voice Feedback
-- Commands provide audio confirmation when executed
-- Error messages are spoken when commands fail
+- Commands provide visible feedback in the popup/HUD
+- Error states explain microphone denial, unsupported speech recognition, and unrecognized commands
 - Status updates are provided for speed and position changes
 
 ### Cultural Considerations
@@ -206,7 +206,7 @@ window.isRecognizableCommand("开始");     // Chinese "start"
 
 ### Planned Features
 - **Regional dialects**: Support for en-US, en-GB, es-ES, es-MX variations
-- **Custom commands**: User-defined voice commands
+- **Custom commands**: User-defined aliases for common commands
 - **Pronunciation learning**: Adaptation to user's accent
 - **Context awareness**: Different commands for different page types
 
@@ -227,7 +227,7 @@ window.isRecognizableCommand("开始");     // Chinese "start"
 
 #### "Wrong language detected"
 1. Check your browser language setting (chrome://settings/languages)
-2. Commands should still work as fallback tries all languages
+2. Commands may still work through fallback aliases, but the selected language should match what you speak
 3. Look for manual language override in extension options
 
 #### "Some languages don't work"

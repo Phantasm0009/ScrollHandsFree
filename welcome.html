@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to ScrollHandsFree</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    .hero,
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 34px;
+      margin: 0 0 8px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+    p {
+      color: var(--muted);
+      margin: 0 0 12px;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .step {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+    .step strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    a,
+    button {
+      min-height: 40px;
+      border-radius: 9px;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 800;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+    ul {
+      color: var(--muted);
+      padding-left: 20px;
+    }
+    @media (max-width: 720px) {
+      .steps {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>ScrollHandsFree</h1>
+      <p>Hands-free reading for long pages, with optional voice commands and local, privacy-conscious settings.</p>
+      <div class="steps">
+        <div class="step"><strong>1. Open a long page</strong><span>Articles, docs, recipes, and study pages work best.</span></div>
+        <div class="step"><strong>2. Click Start</strong><span>The extension injects only when you ask it to run.</span></div>
+        <div class="step"><strong>3. Adjust speed</strong><span>Use presets, the HUD, keyboard shortcuts, or optional voice commands.</span></div>
+      </div>
+      <div class="actions">
+        <a class="primary" href="sample-reading.html">Try on this sample page</a>
+        <a href="options.html">Open options</a>
+        <button id="skipBtn" type="button">Skip</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>No microphone needed for auto-scroll</h2>
+      <p>Voice commands are optional. Auto-scroll, keyboard shortcuts, Reading Focus, and the HUD work without microphone permission.</p>
+      <p>If you enable voice, ScrollHandsFree does not store your voice. Browser speech recognition may be processed by your browser or platform.</p>
+    </section>
+
+    <section class="card">
+      <h2>How permissions work</h2>
+      <ul>
+        <li>Page access is used only to find and move the current scroll area.</li>
+        <li>Settings, per-site preferences, resume positions, aliases, and counters are stored locally.</li>
+        <li>No account, no tracking, no analytics, and no sale of data.</li>
+      </ul>
+    </section>
+  </main>
+  <script src="welcome.js"></script>
+</body>
+</html>

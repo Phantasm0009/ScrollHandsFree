@@ -6,395 +6,771 @@
   <title>ScrollHandsFree</title>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --success: #16a34a;
+      --warning: #d97706;
+      --error: #dc2626;
+      --shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
     }
 
     body {
-      width: 320px;
-      height: 400px;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14px;
+      width: 386px;
+      min-height: 480px;
+      max-height: 660px;
+      overflow-y: auto;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
       line-height: 1.4;
-      color: #333;
-      background: #ffffff;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .header h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #1a73e8;
-      margin-bottom: 4px;
-    }
-
-    .header .status {
-      font-size: 12px;
-      color: #666;
-      font-weight: 500;
-    }
-
-    .status.active {
-      color: #34a853;
-    }
-
-    .status.inactive {
-      color: #ea4335;
-    }
-
-    .control-group {
-      margin-bottom: 16px;
-    }
-
-    .control-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: #444;
-    }
-
-    .button-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+    button,
+    select,
+    input {
+      font: inherit;
     }
 
     button {
-      flex: 1;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
-      outline: none;
+      border: 0;
     }
 
-    button:focus {
-      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    [role="switch"]:focus-visible {
+      outline: 2px solid rgba(37, 99, 235, 0.35);
+      outline-offset: 2px;
+    }
+
+    .shell {
+      padding: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .status-pill {
+      flex: 0 0 auto;
+      max-width: 144px;
+      min-height: 28px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+      text-align: center;
+    }
+
+    .status-pill.scrolling,
+    .status-pill.listening {
+      color: var(--success);
+      border-color: rgba(22, 163, 74, 0.28);
+      background: #f0fdf4;
+    }
+
+    .status-pill.paused,
+    .status-pill.ended {
+      color: var(--warning);
+      border-color: rgba(217, 119, 6, 0.28);
+      background: #fffbeb;
+    }
+
+    .status-pill.error {
+      color: var(--error);
+      border-color: rgba(220, 38, 38, 0.25);
+      background: #fef2f2;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .onboarding {
+      border-color: rgba(37, 99, 235, 0.22);
+      background: #eff6ff;
+    }
+
+    .onboarding[hidden],
+    .drawer[hidden],
+    .dialog-backdrop[hidden] {
+      display: none;
+    }
+
+    .onboarding-title,
+    .section-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin-bottom: 7px;
+    }
+
+    .onboarding p,
+    .drawer p,
+    .trust-list {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .main-control {
+      display: grid;
+      grid-template-columns: 1fr 82px;
+      gap: 10px;
+      align-items: stretch;
     }
 
     .btn-primary {
-      background: #1a73e8;
-      color: white;
+      min-height: 54px;
+      border-radius: 8px;
+      padding: 0 18px;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: #1557b0;
+      background: var(--accent-strong);
     }
 
     .btn-primary:disabled {
-      background: #ccc;
+      background: #bfdbfe;
+      color: #eff6ff;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-stop {
+      min-width: 82px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid rgba(220, 38, 38, 0.18);
+      font-weight: 800;
+    }
+
+    .btn-stop:hover:not(:disabled) {
+      background: #fee2e2;
+    }
+
+    .btn-stop:disabled {
+      color: #fca5a5;
       cursor: not-allowed;
     }
 
-    .btn-secondary {
-      background: #f8f9fa;
-      color: #444;
-      border: 1px solid #dadce0;
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: #e8eaed;
-    }
-
-    .btn-danger {
-      background: #ea4335;
-      color: white;
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      background: #d33b2c;
-    }
-
-    .slider-container {
+    .page-status {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 32px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
-    .slider-container label {
-      margin: 0;
-      min-width: 50px;
+    .page-status span:last-child {
+      min-width: 0;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .progress-strip {
+      margin-top: 9px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+
+    .progress-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress-meta strong {
+      color: var(--text);
       font-size: 13px;
     }
 
+    .progress-track {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dbe3ef;
+    }
+
+    .progress-track span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #0f766e);
+      transition: width 0.18s ease;
+    }
+
+    .page-status strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .direction-row,
+    .preset-row,
+    .footer-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .direction-row {
+      grid-template-columns: 1fr 1fr;
+      margin-top: 10px;
+    }
+
+    .preset-row {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .seg-btn,
+    .icon-btn,
+    .text-btn,
+    .link-btn {
+      min-height: 34px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.15;
+      min-width: 0;
+      padding: 0 10px;
+      white-space: normal;
+    }
+
+    .seg-btn:hover,
+    .icon-btn:hover,
+    .text-btn:hover,
+    .link-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .seg-btn.active,
+    .icon-btn.active {
+      background: #eff6ff;
+      border-color: rgba(37, 99, 235, 0.32);
+      color: var(--accent);
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .form-row label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    select {
+      max-width: 190px;
+      min-height: 34px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      padding: 0 12px;
+      font-size: 12px;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .slider-row label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     input[type="range"] {
-      flex: 1;
+      width: 100%;
       height: 6px;
-      border-radius: 3px;
-      background: #ddd;
-      outline: none;
+      border-radius: 999px;
+      background: #dbe3ef;
       appearance: none;
       -webkit-appearance: none;
     }
 
     input[type="range"]::-webkit-slider-thumb {
-      appearance: none;
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: #1a73e8;
-      cursor: pointer;
+      background: var(--accent);
+      border: 3px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     input[type="range"]::-moz-range-thumb {
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: #1a73e8;
-      cursor: pointer;
-      border: none;
+      background: var(--accent);
+      border: 3px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
     }
 
     .speed-value {
-      min-width: 35px;
-      text-align: center;
-      font-weight: 600;
-      color: #1a73e8;
+      min-width: 68px;
+      color: var(--accent);
+      font-weight: 800;
+      text-align: right;
+      font-size: 12px;
     }
 
-    .feature-toggles {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .toggle-item {
+    .toggle-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 0;
-      position: relative;
+      gap: 10px;
+      padding: 7px 0;
     }
 
-    .toggle-item label {
-      margin: 0;
-      cursor: pointer;
+    .toggle-label {
+      min-width: 0;
+    }
+
+    .toggle-label strong {
+      display: block;
       font-size: 13px;
     }
 
-    .help-btn {
-      position: absolute;
-      right: -30px;
-      width: 20px;
-      height: 20px;
-      border: 1px solid #ccc;
-      border-radius: 50%;
-      background: #f8f9fa;
-      color: #666;
+    .toggle-label span {
+      color: var(--muted);
+      display: block;
       font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
+      overflow-wrap: anywhere;
     }
 
-    .help-btn:hover {
-      background: #1a73e8;
-      color: white;
-      border-color: #1a73e8;
+    .toggle-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
     }
 
     .toggle-switch {
       position: relative;
+      flex: 0 0 44px;
       width: 44px;
       height: 24px;
-      background: #ccc;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .toggle-switch.active {
-      background: #1a73e8;
+      border-radius: 999px;
+      background: #d1d5db;
+      transition: background 0.18s ease;
     }
 
     .toggle-switch::after {
-      content: '';
+      content: "";
       position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 20px;
-      height: 20px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.3s;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.22);
+      transition: transform 0.18s ease;
+    }
+
+    .toggle-switch.active {
+      background: var(--accent);
     }
 
     .toggle-switch.active::after {
       transform: translateX(20px);
     }
 
-    .accessibility-section {
-      border-top: 1px solid #e0e0e0;
-      padding-top: 16px;
-      margin-top: 16px;
-    }
-
-    .accessibility-section h3 {
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: #444;
-    }
-
-    .accessibility-button {
-      width: 100%;
-      padding: 8px 12px;
-      background: #34a853;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .accessibility-button:hover {
-      background: #2d8f47;
-    }
-
-    .accessibility-button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .footer a {
-      color: #1a73e8;
-      text-decoration: none;
+    .micro-btn {
+      flex: 0 0 auto;
+      min-width: 34px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      color: var(--muted);
       font-size: 12px;
+      font-weight: 800;
     }
 
-    .footer a:hover {
-      text-decoration: underline;
+    .micro-btn:hover {
+      color: var(--accent);
+      background: #eff6ff;
+      border-color: rgba(37, 99, 235, 0.26);
     }
 
-    /* High contrast mode support */
-    @media (prefers-contrast: high) {
-      body {
-        background: white;
-        color: black;
-      }
-      
-      button {
-        border: 2px solid black;
-      }
+    .drawer {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f9fafb;
     }
 
-    /* Reduced motion support */
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .command-chip {
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .trust-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 8px;
+      list-style: none;
+      margin-top: 8px;
+    }
+
+    .trust-list li::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      margin-right: 6px;
+      border-radius: 999px;
+      background: var(--success);
+      vertical-align: 1px;
+    }
+
+    .footer-row {
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 2px;
+    }
+
+    .footer-row-four {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .footer-row a,
+    .footer-row button {
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+
+    .dialog-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.34);
+    }
+
+    .dialog {
+      width: 100%;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .dialog h2 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .dialog p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      * {
+      *,
+      *::before,
+      *::after {
         transition: none !important;
+      }
+    }
+
+    @media (prefers-contrast: high) {
+      .panel,
+      .seg-btn,
+      .icon-btn,
+      .text-btn,
+      .link-btn,
+      select {
+        border-color: currentColor;
       }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>ScrollHandsFree</h1>
-    <div id="statusDisplay" class="status inactive">Ready</div>
-  </div>
-
-  <div class="button-row">
-    <button 
-      id="startBtn" 
-      class="btn-primary" 
-      aria-label="Start auto-scrolling"
-      title="Start automatic scrolling">
-      Start
-    </button>
-    <button 
-      id="stopBtn" 
-      class="btn-danger" 
-      aria-label="Stop auto-scrolling"
-      title="Stop automatic scrolling"
-      disabled>
-      Stop
-    </button>
-  </div>
-
-  <div class="button-row">
-    <button 
-      id="scrollUpBtn" 
-      class="btn-secondary" 
-      aria-label="Scroll up"
-      title="Start scrolling upward">
-      ↑ Up
-    </button>
-    <button 
-      id="scrollDownBtn" 
-      class="btn-secondary" 
-      aria-label="Scroll down"
-      title="Start scrolling downward">
-      ↓ Down
-    </button>
-  </div>
-
-  <div class="control-group">
-    <div class="slider-container">
-      <label for="speedSlider">Speed:</label>
-      <input 
-        type="range" 
-        id="speedSlider" 
-        min="1" 
-        max="100" 
-        value="50"
-        aria-label="Scroll speed"
-        title="Adjust scrolling speed (1-100 pixels per second)">
-      <span id="speedValue" class="speed-value">50</span>
-    </div>
-  </div>
-
-  <div class="feature-toggles">
-    <div class="toggle-item">
-      <label for="voiceToggle">Voice Control</label>
-      <div 
-        id="voiceToggle" 
-        class="toggle-switch" 
-        role="switch" 
-        aria-checked="false"
-        aria-label="Toggle voice control"
-        tabindex="0">
+  <main class="shell">
+    <header class="header">
+      <div>
+        <h1 class="title">Scroll Hands Free</h1>
+        <p class="subtitle">A calm reading remote for this tab</p>
       </div>
-      <button id="helpBtn" class="help-btn" title="Show voice commands on page">
-        ?
-      </button>
-    </div>
-  </div>
+      <div id="statusDisplay" class="status-pill" aria-live="polite">Ready on this page</div>
+    </header>
 
-  <div class="accessibility-section">
-    <h3>Accessibility</h3>
-    <button 
-      id="accessibilityBtn" 
-      class="accessibility-button"
-      aria-label="Check page accessibility"
-      title="Run accessibility check on current page">
-      Check Page Accessibility
-    </button>
-  </div>
+    <section id="onboardingPanel" class="panel onboarding" hidden>
+      <div class="onboarding-title">Quick start</div>
+      <p>Choose a speed preset, press Start, then Pause to keep your place or Stop to end the session.</p>
+      <div class="form-row">
+        <span></span>
+        <button id="dismissOnboardingBtn" type="button" class="text-btn">Got it</button>
+      </div>
+    </section>
 
-  <div class="footer">
-    <a href="#" id="optionsLink" title="Open extension options">Options</a>
+    <section id="whatsNewPanel" class="panel onboarding" hidden>
+      <div class="onboarding-title">What's new</div>
+      <p>Cleaner popup, per-tab status, voice setup, language selection, privacy cues, and on-page HUD auto-hide.</p>
+      <div class="form-row">
+        <span></span>
+        <button id="dismissWhatsNewBtn" type="button" class="text-btn">Dismiss</button>
+      </div>
+    </section>
+
+    <section id="resumePanel" class="panel onboarding" hidden>
+      <div class="onboarding-title">Resume reading</div>
+      <p id="resumeText">Resume where you left off?</p>
+      <div class="form-row">
+        <button id="dismissResumeBtn" type="button" class="text-btn">Skip</button>
+        <button id="resumeBtn" type="button" class="text-btn">Resume</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="main-control">
+        <button id="startBtn" type="button" class="btn-primary" title="Start, pause, or resume scrolling">Start scrolling</button>
+        <button id="stopBtn" type="button" class="btn-stop" title="Stop scrolling and end this session" disabled>Stop</button>
+      </div>
+      <div id="pageStatus" class="page-status" aria-live="polite">
+        <span><strong>Works on this tab</strong></span>
+        <span id="targetStatus">Page</span>
+      </div>
+      <div class="progress-strip" aria-label="Reading progress">
+        <div class="progress-meta">
+          <span><strong id="progressPercent">0%</strong> through page</span>
+          <span id="timeRemaining">Time left --</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <span id="progressFill"></span>
+        </div>
+      </div>
+      <div class="direction-row" aria-label="Direction">
+        <button id="scrollUpBtn" type="button" class="icon-btn" title="Scroll upward">Up</button>
+        <button id="scrollDownBtn" type="button" class="icon-btn active" title="Scroll downward">Down</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">Speed</div>
+      <div class="preset-row" aria-label="Speed presets">
+        <button type="button" class="seg-btn preset-btn" data-preset="slow">Slow</button>
+        <button type="button" class="seg-btn preset-btn" data-preset="reading">Reading</button>
+        <button type="button" class="seg-btn preset-btn" data-preset="fast">Fast</button>
+        <button type="button" class="seg-btn preset-btn" data-preset="skim">Skim</button>
+      </div>
+      <div class="slider-row">
+        <label for="speedSlider">Fine tune</label>
+        <input id="speedSlider" type="range" min="1" max="100" value="50" aria-label="Scroll speed">
+        <span id="speedValue" class="speed-value">50 px/sec</span>
+      </div>
+      <div class="form-row">
+        <label for="readingModeSelect">Reading mode</label>
+        <select id="readingModeSelect">
+          <option value="custom">Custom</option>
+          <option value="article">Article</option>
+          <option value="recipe">Recipe</option>
+          <option value="documentation">Documentation</option>
+          <option value="study">Study</option>
+          <option value="fastSkim">Fast skim</option>
+          <option value="teleprompter">Presentation</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="endBehaviorSelect">At page end</label>
+        <select id="endBehaviorSelect">
+          <option value="stop">Stop</option>
+          <option value="loop">Loop to top</option>
+          <option value="reverse">Reverse</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <strong>Voice Commands</strong>
+          <span id="voiceStatusText">Off</span>
+        </div>
+        <div class="toggle-actions">
+          <button id="commandsBtn" type="button" class="micro-btn" title="Show voice commands">Cmds</button>
+          <div id="voiceToggle" class="toggle-switch" role="switch" aria-checked="false" aria-label="Toggle voice commands" tabindex="0"></div>
+        </div>
+      </div>
+      <div id="commandsPanel" class="drawer" hidden>
+        <p>Keep it short and direct:</p>
+        <div class="command-grid" aria-label="Voice command list">
+          <span class="command-chip">Start</span>
+          <span class="command-chip">Pause</span>
+          <span class="command-chip">Stop</span>
+          <span class="command-chip">Faster</span>
+          <span class="command-chip">Slower</span>
+          <span class="command-chip">Up</span>
+          <span class="command-chip">Down</span>
+          <span class="command-chip">Top</span>
+          <span class="command-chip">Bottom</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <strong>Reading Focus</strong>
+          <span>Soft reading area on the page</span>
+        </div>
+        <div id="focusBandToggle" class="toggle-switch" role="switch" aria-checked="false" aria-label="Toggle focus band" tabindex="0"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <strong>On-page HUD</strong>
+          <span>Small page controls, progress, and speed</span>
+        </div>
+        <div id="miniControllerToggle" class="toggle-switch" role="switch" aria-checked="false" aria-label="Toggle on-page HUD" tabindex="0"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">Page tools</div>
+      <div class="preset-row">
+        <button id="chooseAreaBtn" type="button" class="seg-btn">Area</button>
+        <button id="jumpHeadingBtn" type="button" class="seg-btn">Heading</button>
+        <button id="backParagraphBtn" type="button" class="seg-btn">Back</button>
+        <button id="hintsBtn" type="button" class="seg-btn">Hints</button>
+      </div>
+      <div class="preset-row" style="margin-top: 6px;">
+        <button id="jumpTopBtn" type="button" class="seg-btn">Top</button>
+        <button id="jumpBottomBtn" type="button" class="seg-btn">Bottom</button>
+      </div>
+      <div id="hintsPanel" class="drawer" hidden>
+        <p id="hintsSummary">Basic accessibility hints will appear here. This is not a full WCAG audit.</p>
+        <div id="hintsList" class="command-grid"></div>
+      </div>
+    </section>
+
+    <section id="privacyPanel" class="panel" hidden>
+      <div class="section-title">Privacy</div>
+      <p class="subtitle">Page access is used only to find and move the active scroll area.</p>
+      <ul class="trust-list">
+        <li>No account</li>
+        <li>No tracking</li>
+        <li>Local settings</li>
+        <li>Mic only for voice</li>
+      </ul>
+    </section>
+
+    <nav class="footer-row footer-row-four" aria-label="Extension links">
+      <button id="privacyBtn" type="button" class="link-btn">Privacy</button>
+      <button id="optionsLink" type="button" class="link-btn">Settings</button>
+      <button id="helpLink" type="button" class="link-btn">Help</button>
+      <a id="issueLink" class="link-btn" href="https://github.com/Phantasm0009/ScrollHandsFree/issues" target="_blank" rel="noreferrer">Report</a>
+    </nav>
+  </main>
+
+  <div id="voiceSetupDialog" class="dialog-backdrop" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="voiceSetupTitle">
+      <h2 id="voiceSetupTitle">Before enabling voice</h2>
+      <p>Voice commands are handled by your browser. ScrollHandsFree does not collect, store, or transmit audio.</p>
+      <p>Your microphone is used only while voice commands are enabled for this tab.</p>
+      <div class="dialog-actions">
+        <button id="voiceSetupCancelBtn" type="button" class="text-btn">Cancel</button>
+        <button id="voiceSetupContinueBtn" type="button" class="btn-primary">Enable Voice</button>
+      </div>
+    </section>
   </div>
 
   <script src="popup.js"></script>

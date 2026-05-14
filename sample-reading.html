@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrollHandsFree Sample Reading Page</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.7;
+    }
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 22px 120px;
+      background: #ffffff;
+    }
+    h1,
+    h2 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.2;
+    }
+    p {
+      font-size: 18px;
+    }
+    .note {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #eff6ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Sample long page</h1>
+    <p class="note">Open the ScrollHandsFree popup and click Start scrolling. This sample page includes the extension's content script so the popup can control it.</p>
+
+    <h2>Opening rhythm</h2>
+    <p>Good hands-free reading starts slowly. The goal is not to push text past your eyes, but to give the page a steady pace that feels like a quiet reading assistant.</p>
+    <p>Use the Reading preset for a normal pace, Slow for dense material, and Fast skim when you are scanning for a section or checking structure.</p>
+
+    <h2>Reading Focus</h2>
+    <p>Reading Focus dims the page outside a soft horizontal band. It should feel calm, not theatrical. The band is meant to help you keep your place without hiding the page from you.</p>
+    <p>Try turning Reading Focus on, then adjust speed. If the HUD is enabled, it will show progress and time remaining while staying small enough to avoid covering content.</p>
+
+    <h2>Voice commands</h2>
+    <p>Voice commands are optional. If you enable them, try saying start, pause, stop, faster, slower, focus on, bigger focus, or bottom.</p>
+    <p>Auto-scroll still works without microphone permission. The microphone is only used while voice commands are enabled for the current tab.</p>
+
+    <h2>Smart pauses</h2>
+    <p>Headings and natural breaks give the extension places to breathe. A good pause can make auto-scroll feel much less stubborn and much more like a reading tool.</p>
+    <p>Use Natural or Deliberate rhythm in options if you want the page to pause around paragraphs, figures, or section changes.</p>
+
+    <h2>End of page</h2>
+    <p>When you reach the end, ScrollHandsFree can stop, loop to the top, or reverse direction. Stop is the safest reading default; loop and reverse are useful for recipes, notes, and presentations.</p>
+    <p>This is the end of the sample. You can use the HUD or popup to jump to the top and try another preset.</p>
+  </main>
+  <script src="content.js"></script>
+</body>
+</html>

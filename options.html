@@ -6,365 +6,699 @@
   <title>ScrollHandsFree - Options</title>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --success: #16a34a;
+      --warning: #d97706;
+      --error: #dc2626;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background: #f5f5f5;
-      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
     }
 
     .container {
-      max-width: 800px;
+      max-width: 860px;
       margin: 0 auto;
-      background: white;
-      min-height: 100vh;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 32px 20px 48px;
     }
 
     .header {
-      background: #1a73e8;
-      color: white;
-      padding: 32px;
-      text-align: center;
+      margin-bottom: 24px;
     }
 
     .header h1 {
       font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      letter-spacing: 0;
+      margin-bottom: 6px;
     }
 
     .header p {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    .content {
-      padding: 32px;
+      color: var(--muted);
+      font-size: 15px;
     }
 
     .section {
-      margin-bottom: 32px;
-      padding: 24px;
-      background: #f9f9f9;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      border-left: 4px solid #1a73e8;
+      padding: 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .options-nav {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .options-nav button {
+      min-height: 34px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+      text-align: left;
+      padding: 7px 9px;
+    }
+
+    .options-nav button.active {
+      background: #eff6ff;
+      border-color: rgba(37, 99, 235, 0.24);
+      color: var(--accent);
     }
 
     .section h2 {
-      font-size: 20px;
-      margin-bottom: 16px;
-      color: #1a73e8;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .section-intro,
+    .help-text {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section-intro {
+      margin: -6px 0 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      display: grid;
+      gap: 7px;
     }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #444;
-    }
-
-    .form-group input[type="number"],
-    .form-group input[type="text"],
-    .form-group select {
-      width: 100%;
-      max-width: 300px;
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    label {
+      color: var(--text);
+      font-weight: 700;
       font-size: 14px;
-      transition: border-color 0.2s;
     }
 
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      max-width: 340px;
+      min-height: 40px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus,
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid rgba(37, 99, 235, 0.35);
+      outline-offset: 2px;
     }
 
     .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
     }
 
-    .checkbox-group input[type="checkbox"] {
+    .checkbox-group input {
       width: 18px;
       height: 18px;
-      accent-color: #1a73e8;
+      margin-top: 2px;
+      accent-color: var(--accent);
     }
 
-    .checkbox-group label {
-      margin: 0;
-      cursor: pointer;
+    .checkbox-copy label {
+      display: block;
     }
 
-    .help-text {
-      font-size: 13px;
-      color: #666;
-      margin-top: 4px;
+    .voice-commands,
+    .trust-grid,
+    .shortcut-list,
+    .whats-new-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
     }
 
     .voice-commands {
-      background: #e8f0fe;
-      padding: 16px;
-      border-radius: 6px;
-      margin-top: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .voice-commands h4 {
-      margin-bottom: 12px;
-      color: #1a73e8;
+    .command-chip,
+    .trust-item,
+    .shortcut-item,
+    .whats-new-list li {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #f9fafb;
+      padding: 9px 10px;
+      font-size: 13px;
     }
 
-    .voice-commands ul {
-      list-style: none;
-      padding: 0;
+    .command-chip {
+      text-align: center;
+      font-weight: 800;
     }
 
-    .voice-commands li {
-      padding: 4px 0;
-      border-bottom: 1px solid #dadce0;
+    .trust-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .voice-commands li:last-child {
-      border-bottom: none;
+    .trust-item strong {
+      display: block;
+      margin-bottom: 2px;
     }
 
-    .voice-commands .command {
-      font-family: 'Courier New', monospace;
-      background: #f1f3f4;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: bold;
+    .trust-item span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .shortcut-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    kbd {
+      white-space: nowrap;
+      border: 1px solid #cbd5e1;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #ffffff;
+      padding: 2px 7px;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .notice {
+      border-left: 3px solid var(--accent);
+      background: #eff6ff;
+      border-radius: 7px;
+      padding: 12px;
+      color: #1e3a8a;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .notice.warning {
+      border-left-color: var(--warning);
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 74px;
+      max-width: 520px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 9px 11px;
+      resize: vertical;
     }
 
     .actions {
       display: flex;
-      gap: 12px;
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 22px;
     }
 
     .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
+      min-height: 40px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 7px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      outline: none;
-    }
-
-    .btn:focus {
-      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-primary {
-      background: #1a73e8;
-      color: white;
+      background: var(--accent);
+      color: #ffffff;
     }
 
     .btn-primary:hover {
-      background: #1557b0;
+      background: var(--accent-strong);
     }
 
     .btn-secondary {
-      background: #f8f9fa;
-      color: #444;
-      border: 1px solid #dadce0;
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--border);
     }
 
     .btn-secondary:hover {
-      background: #e8eaed;
+      background: #f3f4f6;
+    }
+
+    .success-message,
+    .error-message {
+      display: none;
+      margin-top: 12px;
+      border-radius: 7px;
+      padding: 11px 12px;
+      font-size: 13px;
+      font-weight: 700;
     }
 
     .success-message {
-      background: #d4edda;
-      color: #155724;
-      padding: 12px 16px;
-      border-radius: 4px;
-      margin-top: 16px;
-      display: none;
+      color: #166534;
+      background: #f0fdf4;
+      border: 1px solid rgba(22, 163, 74, 0.22);
     }
 
     .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 12px 16px;
-      border-radius: 4px;
-      margin-top: 16px;
-      display: none;
+      color: #991b1b;
+      background: #fef2f2;
+      border: 1px solid rgba(220, 38, 38, 0.2);
     }
 
-    /* Accessibility */
-    @media (prefers-contrast: high) {
-      body {
-        background: white;
-        color: black;
+    .whats-new-list {
+      padding-left: 0;
+      list-style: none;
+    }
+
+    @media (max-width: 720px) {
+      .container {
+        padding: 22px 14px 32px;
       }
-      
+
+      .form-grid,
+      .voice-commands,
+      .trust-grid,
+      .shortcut-list {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .options-nav {
+        position: static;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .section {
-        background: white;
-        border: 2px solid black;
+        padding: 18px;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      * {
+      *,
+      *::before,
+      *::after {
         transition: none !important;
-      }
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .container {
-        margin: 0;
-        box-shadow: none;
-      }
-
-      .header {
-        padding: 24px 16px;
-      }
-
-      .content {
-        padding: 24px 16px;
-      }
-
-      .section {
-        padding: 16px;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>ScrollHandsFree</h1>
-      <p>Configure your hands-free browsing experience</p>
-    </div>
+  <main class="container">
+    <header class="header">
+      <h1>Scroll Hands Free Settings</h1>
+      <p>Defaults for a calm hands-free reading experience. Active tab controls live in the popup.</p>
+    </header>
 
-    <div class="content">
-      <form id="optionsForm">
-        <div class="section">
-          <h2>Scrolling Settings</h2>
-          
+    <div class="settings-layout">
+      <nav class="options-nav" aria-label="Settings sections">
+        <button type="button" class="active" data-section-target="generalSection">General</button>
+        <button type="button" data-section-target="voiceSection">Voice</button>
+        <button type="button" data-section-target="focusSection">Reading Focus</button>
+        <button type="button" data-section-target="sitesSection">Sites</button>
+        <button type="button" data-section-target="accessibilitySection">Accessibility</button>
+        <button type="button" data-section-target="privacySection">Privacy</button>
+        <button type="button" data-section-target="advancedSection">Advanced</button>
+        <button type="button" data-section-target="changelogSection">What's New</button>
+      </nav>
+
+    <form id="optionsForm">
+      <section id="generalSection" class="section" data-options-section>
+        <h2>Scrolling</h2>
+        <p class="section-intro">Set the behavior that should feel right before you touch any per-tab controls.</p>
+        <div class="form-grid">
           <div class="form-group">
-            <label for="defaultSpeed">Default Scroll Speed (pixels per second):</label>
-            <input 
-              type="number" 
-              id="defaultSpeed" 
-              min="1" 
-              max="100" 
-              value="50"
-              aria-describedby="speedHelp">
-            <div id="speedHelp" class="help-text">
-              Controls how fast the page scrolls automatically. Higher values scroll faster.
-            </div>
+            <label for="defaultSpeed">Default speed</label>
+            <input id="defaultSpeed" type="number" min="1" max="100" value="50" aria-describedby="speedHelp">
+            <div id="speedHelp" class="help-text">Pixels per second. Reading usually feels best around 35-55.</div>
           </div>
-        </div>
 
-        <div class="section">
-          <h2>Voice Control Settings</h2>
-          
           <div class="form-group">
-            <label for="voiceActivationKey">Voice Control Activation Shortcut:</label>
-            <select id="voiceActivationKey" aria-describedby="keyHelp">
-              <option value="Ctrl+Shift+S">Ctrl+Shift+S</option>
-              <option value="Ctrl+Shift+V">Ctrl+Shift+V</option>
-              <option value="Alt+Shift+S">Alt+Shift+S</option>
-              <option value="Alt+Shift+V">Alt+Shift+V</option>
+            <label for="endBehavior">When reaching the end</label>
+            <select id="endBehavior" aria-describedby="endBehaviorHelp">
+              <option value="stop">Stop and show "Reached end"</option>
+              <option value="loop">Loop back to the top</option>
+              <option value="reverse">Reverse direction</option>
             </select>
-            <div id="keyHelp" class="help-text">
-              Keyboard shortcut to quickly toggle voice control on/off.
+            <div id="endBehaviorHelp" class="help-text">Use Stop for reading, Loop for recipes or references, Reverse for review passes.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="defaultDirection">Default direction</label>
+            <select id="defaultDirection">
+              <option value="1">Down</option>
+              <option value="-1">Up</option>
+            </select>
+            <div class="help-text">Most reading starts downward, but teleprompter-style use may prefer up.</div>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="hudEnabled">
+            <div class="checkbox-copy">
+              <label for="hudEnabled">Show on-page HUD by default</label>
+              <div class="help-text">Small controls on the page with progress, speed, pause, and stop.</div>
             </div>
           </div>
 
-          <div class="voice-commands">
-            <h4>Supported Voice Commands:</h4>
-            <ul>
-              <li><span class="command">"start"</span> or <span class="command">"begin"</span> - Start auto-scrolling</li>
-              <li><span class="command">"stop"</span> or <span class="command">"halt"</span> - Stop auto-scrolling</li>
-              <li><span class="command">"up"</span> or <span class="command">"backward"</span> - Scroll up</li>
-              <li><span class="command">"down"</span> or <span class="command">"forward"</span> - Scroll down</li>
-              <li><span class="command">"faster"</span> or <span class="command">"slower"</span> - Adjust speed</li>
-              <li><span class="command">"turbo"</span> or <span class="command">"max speed"</span> - Maximum speed</li>
-              <li><span class="command">"top"</span> or <span class="command">"bottom"</span> - Jump to page ends</li>
-              <li><span class="command">"current speed"</span> or <span class="command">"where am I"</span> - Status info</li>
-              <li><span class="command">"help"</span> or <span class="command">"what can I say"</span> - Show all commands</li>
-            </ul>
+          <div class="checkbox-group">
+            <input type="checkbox" id="autoPauseOnUserScroll">
+            <div class="checkbox-copy">
+              <label for="autoPauseOnUserScroll">Pause after manual scrolling</label>
+              <div class="help-text">Stops auto-scroll from fighting you when you adjust the page by hand.</div>
+            </div>
           </div>
-        </div>
 
-        <div class="section">
-          <h2>Advanced Settings</h2>
-          
-          <div class="form-group">
-            <label for="pauseAtHeadings">Pause Duration at Headings (seconds):</label>
-            <input 
-              type="number" 
-              id="pauseAtHeadings" 
-              min="0" 
-              max="10" 
-              step="0.5" 
-              value="2"
-              aria-describedby="pauseHelp">
-            <div id="pauseHelp" class="help-text">
-              How long to pause when reaching a new heading section. Set to 0 to disable.
+          <div class="checkbox-group">
+            <input type="checkbox" id="smartPausing">
+            <div class="checkbox-copy">
+              <label for="smartPausing">Auto-pause at headings</label>
+              <div class="help-text">Useful for articles and documentation. Presets may turn this on automatically.</div>
             </div>
           </div>
 
           <div class="form-group">
-            <div class="checkbox-group">
-              <input type="checkbox" id="smartPausing">
-              <label for="smartPausing">Smart pausing at content breaks</label>
-            </div>
-            <div class="help-text">
-              Automatically pause at natural reading breaks like paragraphs and sections.
-            </div>
+            <label for="pauseAtHeadings">Heading pause duration</label>
+            <input id="pauseAtHeadings" type="number" min="0" max="10" step="0.5" value="2" aria-describedby="pauseHelp">
+            <div id="pauseHelp" class="help-text">Seconds to pause when a heading reaches the reading area. Use 0 to disable.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="voiceSection" class="section" data-options-section hidden>
+        <h2>Voice</h2>
+        <p class="section-intro">Voice is enabled per tab from the popup. Your browser handles speech recognition.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="voiceLanguage">Voice language</label>
+            <select id="voiceLanguage">
+              <option value="auto">Auto, browser language</option>
+              <option value="en-US">English, US</option>
+              <option value="en-GB">English, UK</option>
+              <option value="es-ES">Spanish</option>
+              <option value="fr-FR">French</option>
+              <option value="de-DE">German</option>
+              <option value="it-IT">Italian</option>
+              <option value="pt-BR">Portuguese</option>
+              <option value="ja-JP">Japanese</option>
+              <option value="zh-CN">Chinese, Simplified</option>
+              <option value="ko-KR">Korean</option>
+              <option value="hi-IN">Hindi</option>
+            </select>
+            <div class="help-text">Multilingual commands are available, but reliability depends on browser speech support.</div>
           </div>
         </div>
 
+        <div class="voice-commands" aria-label="Supported voice commands">
+          <span class="command-chip">Start</span>
+          <span class="command-chip">Pause</span>
+          <span class="command-chip">Stop</span>
+          <span class="command-chip">Faster</span>
+          <span class="command-chip">Slower</span>
+          <span class="command-chip">Up</span>
+          <span class="command-chip">Down</span>
+          <span class="command-chip">Top</span>
+          <span class="command-chip">Bottom</span>
+        </div>
+
+        <div class="form-grid" style="margin-top: 16px;">
+          <div class="form-group">
+            <label for="startAliases">Custom Start aliases</label>
+            <input id="startAliases" type="text" placeholder="read, go, coffee mode">
+            <div class="help-text">Comma-separated words or phrases.</div>
+          </div>
+          <div class="form-group">
+            <label for="pauseAliases">Custom Pause aliases</label>
+            <input id="pauseAliases" type="text" placeholder="hold, wait">
+          </div>
+          <div class="form-group">
+            <label for="stopAliases">Custom Stop aliases</label>
+            <input id="stopAliases" type="text" placeholder="quit, enough">
+          </div>
+          <div class="form-group">
+            <label for="fasterAliases">Custom Faster aliases</label>
+            <input id="fasterAliases" type="text" placeholder="speed up, quicker">
+          </div>
+          <div class="form-group">
+            <label for="slowerAliases">Custom Slower aliases</label>
+            <input id="slowerAliases" type="text" placeholder="slow down, easier">
+          </div>
+        </div>
+
+        <h3>Disable Commands</h3>
+        <p class="section-intro">Turn off commands you do not use. This helps avoid accidental matches.</p>
+        <div class="form-grid">
+          <div class="checkbox-group">
+            <input type="checkbox" id="disableStartCommand">
+            <div class="checkbox-copy"><label for="disableStartCommand">Disable Start</label></div>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="disablePauseCommand">
+            <div class="checkbox-copy"><label for="disablePauseCommand">Disable Pause</label></div>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="disableStopCommand">
+            <div class="checkbox-copy"><label for="disableStopCommand">Disable Stop</label></div>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="disableFasterCommand">
+            <div class="checkbox-copy"><label for="disableFasterCommand">Disable Faster</label></div>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="disableSlowerCommand">
+            <div class="checkbox-copy"><label for="disableSlowerCommand">Disable Slower</label></div>
+          </div>
+        </div>
+        <div id="aliasConflictWarning" class="notice warning" hidden></div>
+
+        <h3>Command Test</h3>
+        <p class="section-intro">Type a phrase to check which local command it would match. This does not use the microphone.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="voiceTestPhrase">Test phrase</label>
+            <input id="voiceTestPhrase" type="text" placeholder="try: coffee mode">
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="button" class="btn btn-secondary" id="voiceTestBtn">Test Command</button>
+          </div>
+        </div>
+        <div id="voiceTestResult" class="notice" hidden></div>
+
+        <div class="notice">Voice commands are handled by your browser. ScrollHandsFree does not collect, store, or transmit audio.</div>
+      </section>
+
+      <section id="advancedSection" class="section" data-options-section hidden>
+        <h2>Keyboard</h2>
+        <p class="section-intro">Chrome allows only four default extension shortcuts. Voice toggle can be assigned manually.</p>
+        <div class="shortcut-list" aria-label="Keyboard shortcuts">
+          <div class="shortcut-item"><span>Start / Pause</span><kbd>Ctrl+Shift+S</kbd></div>
+          <div class="shortcut-item"><span>Stop</span><kbd>Ctrl+Shift+X</kbd></div>
+          <div class="shortcut-item"><span>Faster</span><kbd>Ctrl+Shift+F</kbd></div>
+          <div class="shortcut-item"><span>Slower</span><kbd>Ctrl+Shift+L</kbd></div>
+          <div class="shortcut-item"><span>Toggle Voice</span><kbd>Assign manually</kbd></div>
+        </div>
         <div class="actions">
-          <button type="submit" class="btn btn-primary" id="saveBtn">
-            Save Settings
-          </button>
-          <button type="button" class="btn btn-secondary" id="resetBtn">
-            Reset to Defaults
-          </button>
+          <a class="btn btn-secondary" href="chrome://extensions/shortcuts" target="_blank" rel="noreferrer">Open Chrome Shortcuts</a>
+          <button type="button" class="btn btn-secondary" id="diagnosticsBtn">Copy Diagnostic Info</button>
         </div>
+        <textarea id="diagnosticsBox" aria-label="Diagnostic info" placeholder="Diagnostic info appears here when generated."></textarea>
+      </section>
 
-        <div id="successMessage" class="success-message">
-          Settings saved successfully!
-        </div>
+      <section id="focusSection" class="section" data-options-section hidden>
+        <h2>Reading Focus</h2>
+        <p class="section-intro">Dim distractions and keep a horizontal reading band visible.</p>
+        <div class="form-grid">
+          <div class="checkbox-group">
+            <input type="checkbox" id="focusBandEnabled">
+            <div class="checkbox-copy">
+              <label for="focusBandEnabled">Focus band by default</label>
+              <div class="help-text">Shows a soft horizontal reading band on pages where you enable scrolling.</div>
+            </div>
+          </div>
 
-        <div id="errorMessage" class="error-message">
-          Error saving settings. Please try again.
+          <div class="form-group">
+            <label for="focusBandHeight">Band height</label>
+            <input id="focusBandHeight" type="number" min="12" max="60" value="24">
+            <div class="help-text">Viewport percent, from 12 to 60.</div>
+          </div>
+          <div class="form-group">
+            <label for="focusDimOpacity">Dim opacity</label>
+            <input id="focusDimOpacity" type="number" min="0" max="0.35" step="0.01" value="0.08">
+            <div class="help-text">Use 0 for no dimming, 0.35 for strong dimming.</div>
+          </div>
+          <div class="form-group">
+            <label for="readingRhythm">Pause at natural breaks</label>
+            <select id="readingRhythm">
+              <option value="smooth">Smooth</option>
+              <option value="natural">Natural</option>
+              <option value="deliberate">Deliberate</option>
+            </select>
+          </div>
         </div>
-      </form>
+      </section>
+
+      <section id="sitesSection" class="section" data-options-section hidden>
+        <h2>Sites</h2>
+        <p class="section-intro">Per-site preferences are stored locally by domain.</p>
+        <div class="trust-grid">
+          <div class="trust-item"><strong id="currentSiteLabel">Current site</strong><span>Open a regular website to customize it.</span></div>
+          <div class="trust-item"><strong>Scroll area</strong><span>Use the popup or context menu to choose an area.</span></div>
+        </div>
+        <div class="form-grid" style="margin-top: 16px;">
+          <div class="checkbox-group">
+            <input type="checkbox" id="siteBlocked">
+            <div class="checkbox-copy">
+              <label for="siteBlocked">Never enable on this site</label>
+              <div class="help-text">The extension will refuse scroll commands on this domain.</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="siteSpeed">Per-site speed</label>
+            <input id="siteSpeed" type="number" min="1" max="100" value="50">
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="siteFocusBandEnabled">
+            <div class="checkbox-copy">
+              <label for="siteFocusBandEnabled">Reading Focus on this site</label>
+              <div class="help-text">Use this site's saved preference instead of the global default.</div>
+            </div>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="siteHudEnabled">
+            <div class="checkbox-copy">
+              <label for="siteHudEnabled">HUD on this site</label>
+              <div class="help-text">HUD position is saved automatically when you drag it.</div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" id="saveSiteBtn">Save Site Settings</button>
+          <button type="button" class="btn btn-secondary" id="resetSiteBtn">Reset This Site</button>
+        </div>
+      </section>
+
+      <section id="accessibilitySection" class="section" data-options-section hidden>
+        <h2>Accessibility</h2>
+        <p class="section-intro">These are interface preferences and basic page hints, not a full WCAG audit.</p>
+        <div class="trust-grid">
+          <div class="trust-item"><strong>Keyboard reachable</strong><span>Popup and HUD controls can be focused and activated by keyboard.</span></div>
+          <div class="trust-item"><strong>Reduced motion</strong><span>Animations respect your browser reduced-motion setting.</span></div>
+          <div class="trust-item"><strong>High contrast</strong><span>Extension surfaces respect high-contrast preferences.</span></div>
+          <div class="trust-item"><strong>Basic hints only</strong><span>Use "Hints" in the popup for simple page checks.</span></div>
+        </div>
+      </section>
+
+      <section id="privacySection" class="section" data-options-section hidden>
+        <h2>Privacy</h2>
+        <p class="section-intro">The extension needs page access so it can find the scrollable area and move it.</p>
+        <div class="trust-grid">
+          <div class="trust-item"><strong>No account</strong><span>Nothing to sign in to.</span></div>
+          <div class="trust-item"><strong>No tracking</strong><span>No analytics or behavioral profiling.</span></div>
+          <div class="trust-item"><strong>Local settings</strong><span>Preferences stay in Chrome storage.</span></div>
+          <div class="trust-item"><strong>Browser-handled microphone</strong><span>Optional voice commands may be processed by your browser/platform.</span></div>
+        </div>
+        <div id="usageCountersSummary" class="notice">Local usage counters stay on this device.</div>
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" id="exportSettingsBtn">Export JSON</button>
+          <button type="button" class="btn btn-secondary" id="importSettingsBtn">Import JSON</button>
+          <button type="button" class="btn btn-secondary" id="clearPositionsBtn">Clear Resume Positions</button>
+          <button type="button" class="btn btn-secondary" id="clearAllBtn">Clear Local Data</button>
+          <a class="btn btn-secondary" href="privacy.html" target="_blank" rel="noreferrer">Open Privacy Policy</a>
+        </div>
+        <textarea id="importExportBox" aria-label="Import or export settings JSON" placeholder="Exported or imported JSON appears here."></textarea>
+      </section>
+
+      <section id="changelogSection" class="section" data-options-section hidden>
+        <h2>What's New</h2>
+        <ul class="whats-new-list">
+          <li>Pause and resume are now separate from Stop.</li>
+          <li>Speed presets, reading modes, Reading Focus, and the on-page HUD are available from the popup.</li>
+          <li>The popup now tracks each tab's scrolling, paused, listening, and end-of-page state.</li>
+          <li>Nested scrollable areas are detected for docs, apps, recipes, and article layouts.</li>
+          <li>Voice setup now explains microphone use before enabling voice commands.</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-secondary" href="https://github.com/Phantasm0009/ScrollHandsFree/issues" target="_blank" rel="noreferrer">Report an Issue</a>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="saveBtn">Save Settings</button>
+        <button type="button" class="btn btn-secondary" id="resetBtn">Reset to Defaults</button>
+      </div>
+
+      <div id="successMessage" class="success-message">Settings saved.</div>
+      <div id="errorMessage" class="error-message">Error saving settings.</div>
+    </form>
     </div>
-  </div>
+  </main>
 
   <script src="options.js"></script>
 </body>
