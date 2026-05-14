@@ -1,205 +1,381 @@
-# ScrollHands Free Chrome Extension
+# ScrollHandsFree
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-blue.svg)](https://chrome.google.com/webstore)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Manifest V3](https://img.shields.io/badge/Chrome-Manifest%20V3-blue.svg)](manifest.json)
 
-A lightweight Chrome extension that turns long pages into a calm hands-free reading experience with auto-scroll, optional voice commands, Reading Focus, and local privacy-conscious settings.
+ScrollHandsFree is a Chrome extension for hands-free reading on long webpages. It provides user-triggered auto-scroll, pause/resume, reading speed presets, optional voice commands, Reading Focus, an on-page HUD, and local privacy-conscious settings.
 
-## ✨ Features
+The core promise is simple: open a long article, recipe, documentation page, study page, or presentation script and control scrolling without constantly touching the mouse or trackpad.
 
-- **🤲 Hands-Free Auto-Scrolling**: Automatically scroll pages or nested scroll areas at your preferred speed
-- **Pause / Resume / Stop**: Pause keeps the current session ready; Stop ends it
-- **Speed Presets**: Slow, Reading, Fast, and Skim presets with a fine-tune slider
-- **Reading Modes**: Article, Recipe, Documentation, Study, Fast Skim, and Presentation presets
-- **🎙️ Voice Commands**: Start, pause, stop, change speed, change direction, and jump to top or bottom
-- **🎯 Reading Focus**: Optional soft reading band with adjustable height and dim strength
-- **On-Page HUD**: Optional draggable page controls with pause/resume, stop, speed, direction, progress, and current heading
-- **Smart Pausing**: Optional pause at headings, natural content breaks, and after manual user scroll
-- **Per-Tab State**: The popup reflects whether the current tab is scrolling, paused, listening, stopped, or at the end
-- **Per-Site Settings**: Save site-specific speed, blocked-site preferences, and selected scroll areas
-- **Page Navigation**: Choose a scroll area, jump to the next heading, jump back one paragraph, or jump to page ends
-- **Resume Position**: Locally remember reading position and ask before resuming
-- **Basic Accessibility Hints**: Show simple page hints without claiming a full WCAG audit
+## Current status
 
-## 🚀 Installation
+This repository is a vanilla JavaScript Manifest V3 extension. There is no build step, no bundled package manager, no server component, and no analytics pipeline.
 
-1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked" and select the extension folder
-5. The ScrollHands Free icon will appear in your extension toolbar
+The current version focuses on:
 
-## 📖 How to Use
+- reliable user-triggered scrolling,
+- calmer popup controls,
+- per-tab state,
+- optional on-page controls,
+- clearer privacy and microphone messaging,
+- local settings and per-site preferences.
 
-### Basic Controls
-1. Click the ScrollHands Free icon in your toolbar
-2. Choose a speed preset or adjust the slider
-3. Click "Start" to begin auto-scrolling
-4. Click "Pause" to keep the session ready, or "Stop" to end it
-5. Use "At page end" to stop, loop to top, or reverse direction
+## Features
 
-### Voice Commands
-1. Enable voice commands by clicking the voice toggle in the popup
-2. Use these voice commands:
-   - **"start"** or **"begin"** - Start auto-scrolling
-   - **"pause"** - Pause the current session
-   - **"stop"** or **"halt"** - Stop and end the session
-   - **"faster"** or **"speed up"** - Increase scroll speed
-   - **"slower"** or **"slow down"** - Decrease scroll speed
-   - **"up"** or **"down"** - Change direction
-   - **"top"** or **"bottom"** - Jump to the page ends
-   - **"focus on"** or **"focus off"** - Toggle Reading Focus
+### Core scrolling
+
+- Start, pause, resume, and stop auto-scroll.
+- Pause keeps the current session ready; Stop ends the session.
+- Smooth time-based scrolling with pixels-per-second behavior.
+- Direction controls for scrolling down or up.
+- Speed presets: Slow, Reading, Fast, and Skim.
+- Fine-tune speed slider.
+- End-of-page behavior: stop, loop to top, or reverse direction.
+- Per-tab state so the popup reflects the active tab instead of a global stale state.
+- Reached-end and reached-top status updates.
+
+### Reading presets
+
+Reading modes adjust speed and behavior together:
+
+- Article
+- Recipe
+- Documentation
+- Study
+- Fast skim
+- Presentation / teleprompter
+- Custom
+
+These presets are convenience defaults, not a separate AI reading system.
+
+### Page and scroll-area handling
+
+- Detects the page scroll target or a likely nested scrollable area.
+- Includes a "Choose scroll area" mode for pages with multiple scroll panes.
+- Saves selected scroll area information locally per site when available.
+- Works best on normal webpages, articles, documentation sites, recipes, and web apps with clear scroll containers.
+- Does not run on restricted browser pages such as `chrome://` pages or the Chrome Web Store.
+
+### On-page HUD
+
+The optional HUD gives page-level controls without reopening the popup:
+
+- pause/resume,
+- stop,
+- slower/faster,
+- direction,
+- progress percentage,
+- estimated time remaining,
+- current heading when detectable,
+- hide control,
+- draggable position saved locally per site.
+
+The HUD is optional and can be turned off from the popup or options page.
 
 ### Reading Focus
-- Toggle Reading Focus to soften the page outside the current reading area
-- Perfect for reducing distractions while reading
-- Works best with article, documentation, and study reading modes
 
-### On-Page HUD and Page Tools
-- Enable the HUD for page-level controls without reopening the popup
-- Use Page Tools to choose a scroll area, jump to top/bottom, or view basic accessibility hints
-- Right-click a page to start scrolling, choose a scroll area, toggle Reading Focus, or stop
+Reading Focus adds a soft horizontal reading band and dims the rest of the page.
 
-## ⚙️ Options & Settings
+- Toggle from the popup, voice command, or context menu.
+- Adjustable band height.
+- Adjustable dim opacity.
+- Works alongside auto-scroll.
+- Intended to reduce visual distraction, not to modify or simplify page content.
 
-Access the options page by clicking "Options" in the popup or through Chrome's extension management.
+### Smart pausing
 
-### Scrolling Settings
-- **Default Scroll Speed**: Set your preferred scrolling speed
-- **End-of-Page Behavior**: Stop, loop, or reverse when reaching the top or bottom
-- **Pause After Manual Scrolling**: Pause briefly when you manually adjust the page
-- **Auto-Pause at Headings**: Pause briefly when a heading reaches the reading area
+Optional pausing behavior includes:
 
-### Voice Commands Settings
-- **Voice Language**: Choose browser auto-detection or a supported language
-- **Command List**: Short list of supported commands
-- **Custom Aliases**: Add local aliases for common commands
-- **Disabled Commands & Test Mode**: Turn off commands you do not use and test alias matching without the microphone
-- **Microphone Note**: Voice commands are handled by the browser; ScrollHandsFree does not collect or store audio
+- pause at headings,
+- pause briefly after manual user scrolling,
+- natural-break behavior based on the selected reading rhythm.
 
-### Keyboard Shortcuts
-- **Start / Pause**: Ctrl+Shift+S
-- **Stop**: Ctrl+Shift+X
-- **Faster**: Ctrl+Shift+F
-- **Slower**: Ctrl+Shift+L
-- **Toggle Voice**: assign manually at `chrome://extensions/shortcuts`
+This is heuristic behavior. It works best on pages with semantic headings and normal document structure.
 
-### Advanced Settings
-- **Reading Focus**: Turn the reading band on by default and adjust band size/dim strength
-- **On-Page HUD**: Turn the on-page controller on by default
-- **Per-Site Settings**: Block a site or set a site-specific reading speed
-- **HUD Position**: Drag the HUD and ScrollHandsFree saves its position locally for the site
-- **Privacy Tools**: Export/import settings and clear locally stored settings, positions, aliases, counters, or per-site preferences
+### Voice commands
 
-## 🛠️ Technical Details
+Voice commands are optional. Auto-scroll works without microphone permission.
 
-### Architecture
-- **Manifest V3**: Uses the latest Chrome extension standard
-- **Service Worker**: Lightweight background script for message handling
-- **On-Demand Content Script**: Injected only when the user starts a page action
-- **Popup & Options**: User interface for controls and configuration
+Supported command categories include:
 
-### Permissions
-- `activeTab`: Temporary access to the current tab after a user action
-- `scripting`: Inject the content script only when needed
-- `storage`: Save user preferences
-- `contextMenus`: Provide right-click page actions
-- `optional_host_permissions`: Available for future persistent per-site behavior; normal scrolling uses user-triggered active tab access
+- start,
+- pause/resume,
+- stop,
+- faster,
+- slower,
+- up,
+- down,
+- top,
+- bottom,
+- focus on/off,
+- bigger/smaller focus,
+- speed/status style commands.
 
-### Browser Compatibility
-- Chrome 88+ (Manifest V3 requirement)
-- Chromium-based browsers (Edge, Opera, Brave)
+Voice reliability depends on the browser Web Speech API, microphone permission, selected language, accent, network/platform behavior, and whether the active page allows the content script to run. The extension includes multilingual command dictionaries and a language setting, but this should not be described as guaranteed support for every listed language unless those languages have been tested.
 
-## 🔧 Development
+### Voice customization
 
-### Project Structure
+Options include:
+
+- voice language selection,
+- custom aliases for common commands,
+- disabled commands,
+- a no-microphone command test field,
+- visible feedback for listening, recognized commands, unrecognized commands, and microphone/unsupported states.
+
+### Keyboard shortcuts
+
+Chrome allows only four default suggested shortcuts in the manifest, so the extension ships with:
+
+- Start / Pause: `Ctrl+Shift+S`
+- Stop: `Ctrl+Shift+X`
+- Faster: `Ctrl+Shift+F`
+- Slower: `Ctrl+Shift+L`
+
+Toggle Voice is registered without a default shortcut. Assign it manually from Chrome's extension shortcut settings if you want it.
+
+### Popup tools
+
+The popup includes:
+
+- status pill for the active tab,
+- current progress and time remaining,
+- start/pause/resume control,
+- stop control,
+- speed presets and slider,
+- reading mode selector,
+- direction buttons,
+- end behavior selector,
+- voice setup and command list,
+- Reading Focus toggle,
+- HUD toggle,
+- page tools for scroll area, top/bottom, next heading, and back one paragraph,
+- basic accessibility hints,
+- privacy summary,
+- help and issue links.
+
+### Basic accessibility hints
+
+ScrollHandsFree can show simple page hints for common issues such as:
+
+- images missing alt text,
+- heading structure,
+- unlabeled form controls,
+- missing page language,
+- broken ARIA references,
+- basic keyboard focus concerns.
+
+This is not a full WCAG audit and should not be marketed as compliance checking.
+
+### Local settings and per-site preferences
+
+Stored locally in Chrome storage:
+
+- default speed,
+- current speed,
+- reading mode,
+- end behavior,
+- focus band settings,
+- HUD setting and HUD position,
+- selected scroll container information,
+- per-site speed/blocking preferences,
+- resume positions,
+- voice aliases and disabled commands,
+- local usage counters.
+
+Local usage counters are used only inside the extension UI and are not sent anywhere.
+
+## Installation
+
+1. Download or clone this repository.
+2. Open Chrome and go to `chrome://extensions/`.
+3. Enable Developer mode.
+4. Click Load unpacked.
+5. Select this folder.
+6. Pin ScrollHandsFree from the extensions menu if you want quick access.
+
+If Chrome reports a manifest error, reload from the folder containing `manifest.json`.
+
+## How to use
+
+### Basic flow
+
+1. Open a long webpage.
+2. Click the ScrollHandsFree toolbar icon.
+3. Choose a speed preset or reading mode.
+4. Click Start scrolling.
+5. Use Pause to temporarily pause, Resume to continue, or Stop to end the session.
+
+### Try the sample page
+
+Open `sample-reading.html` from this repository to test scrolling, Reading Focus, HUD behavior, and voice commands on a predictable page.
+
+### Voice setup
+
+1. Open the popup.
+2. Turn on Voice Commands.
+3. Read the microphone/privacy explanation.
+4. Allow microphone access if you want voice commands.
+5. Try short commands such as "start", "pause", "faster", "slower", or "stop".
+
+If voice is unsupported or microphone permission is denied, auto-scroll still works.
+
+### Scroll area selection
+
+Use Choose scroll area when a page has multiple scrollable regions, such as:
+
+- documentation pages with sidebars,
+- app layouts with nested panes,
+- recipe pages with sticky sections,
+- modals or internal content panels.
+
+Click the area you want ScrollHandsFree to control.
+
+## Options page
+
+The options page is organized into sections:
+
+- General: default speed, direction, end behavior, HUD default, manual-scroll pause, heading pause.
+- Voice: language, command aliases, disabled commands, command test, microphone/privacy note.
+- Reading Focus: default focus setting, band height, dim opacity, reading rhythm.
+- Sites: current-site block/speed/focus/HUD preferences.
+- Accessibility: basic accessibility notes and high-level support claims.
+- Privacy: local data explanation, clear controls, import/export.
+- Advanced: keyboard shortcut information and diagnostics.
+- What's New: short changelog summary.
+
+## Permissions and privacy
+
+### Manifest permissions
+
+- `activeTab`: temporary access to the current tab after user action.
+- `scripting`: inject `content.js` on demand.
+- `storage`: save local settings and per-site preferences.
+- `contextMenus`: provide right-click actions.
+- `optional_host_permissions` for `http://*/*` and `https://*/*`: reserved for persistent per-site behavior. Normal scrolling is user-triggered through active tab access.
+
+### Data handling
+
+ScrollHandsFree does not include:
+
+- accounts,
+- cloud sync,
+- analytics,
+- telemetry,
+- ads,
+- tracking pixels,
+- server-side storage.
+
+Settings and reading state are stored locally in the browser. Voice commands are handled through the browser's speech recognition API. ScrollHandsFree does not store audio, but browser speech recognition may be processed by the browser or platform provider.
+
+See `privacy.html` for the in-extension privacy policy text.
+
+## Browser compatibility
+
+Primary target:
+
+- Google Chrome with Manifest V3 support.
+
+Expected compatibility:
+
+- Chromium-based browsers such as Edge, Brave, and Opera may work, but voice recognition and shortcut behavior can vary.
+
+Not guaranteed:
+
+- Firefox.
+- Safari.
+- Restricted browser pages.
+- Chrome Web Store pages.
+- Pages that block extension injection or do not expose a usable scroll area.
+
+## Development
+
+### Project structure
+
+```text
+ScrollHandsFree-main/
+|-- manifest.json          # MV3 manifest
+|-- background.js          # service worker, commands, state, injection, storage
+|-- content.js             # scroll engine, HUD, focus band, voice, page hints
+|-- popup.html             # popup UI
+|-- popup.js               # popup logic and active-tab controls
+|-- options.html           # settings UI
+|-- options.js             # settings logic
+|-- welcome.html           # first-run page
+|-- changelog.html         # update page
+|-- privacy.html           # privacy policy page
+|-- sample-reading.html    # manual test page
+|-- CHANGELOG.md           # release notes
+|-- RECENT_UPDATES.md      # short update summary
+|-- STORE_LISTING.md       # store listing draft
+|-- MULTILINGUAL_VOICE_COMMANDS.md
+|-- icons/
+`-- README.md
 ```
-scrollhands/
-├── .github/
-│   └── copilot-instructions.md  # Development guidelines
-├── icons/
-│   ├── icon16.png              # Extension icons
-│   ├── icon48.png
-│   └── icon128.png
-├── manifest.json               # Extension manifest
-├── background.js               # Service worker
-├── content.js                  # Content script
-├── popup.html                  # Popup interface
-├── popup.js                    # Popup logic
-├── options.html                # Options page
-├── options.js                  # Options logic
-└── README.md                   # This file
+
+### Build
+
+No build process is required.
+
+### Quick validation
+
+```bash
+node --check background.js content.js popup.js options.js
+python3 -m json.tool manifest.json >/dev/null
 ```
 
-### Building
-No build process required - this is a vanilla JavaScript extension.
+### Manual testing checklist
 
-### Testing
-1. Load the extension in Chrome developer mode
-2. Test on various websites (news sites, blogs, documentation)
-3. Verify voice commands work in different environments
-4. Verify Reading Focus, HUD controls, scroll-area detection, and basic accessibility hints
+Test on:
 
-## 🎯 Voice Command Examples
+- a long article,
+- documentation with a nested content pane,
+- a recipe page,
+- a short page,
+- a page with headings,
+- a page with form controls,
+- a restricted page such as `chrome://extensions/`.
 
-| Command | Action |
-|---------|--------|
-| "start scrolling" | Begin auto-scroll |
-| "pause" | Pause the current session |
-| "stop" | Stop and end the session |
-| "go faster" | Increase speed by 10 |
-| "slow down" | Decrease speed by 10 |
-| "up" | Scroll upward |
-| "down" | Scroll downward |
-| "top" | Jump to the top |
-| "bottom" | Jump to the bottom |
+Verify:
 
-## ♿ Accessibility
+- start, pause, resume, stop,
+- speed presets and slider,
+- end-of-page behavior,
+- per-tab popup state,
+- HUD appearance and drag behavior,
+- Reading Focus toggle and sizing,
+- scroll area selection,
+- next heading and back paragraph,
+- resume prompt,
+- voice setup and failure states,
+- options saving,
+- diagnostics,
+- basic accessibility hints.
 
-ScrollHands Free is designed with accessibility in mind:
+## Known limitations
 
-- **ARIA Labels**: All interactive elements have proper labels
-- **Keyboard Navigation**: Keyboard-accessible popup, options, and HUD controls
-- **Screen Reader Support**: Clear labels and status messages for core controls
-- **High Contrast**: Support for high contrast mode
-- **Reduced Motion**: Respects user motion preferences
-- **Basic Page Hints**: Optional hints for common page issues such as missing image alt text, headings, labels, language, and ARIA references. This is not a full WCAG audit.
+- Voice commands depend on browser speech recognition and may be inconsistent.
+- Multilingual command dictionaries exist, but each advertised language should be tested before public marketing claims.
+- Scroll-area detection is heuristic and may choose the wrong pane on complex web apps.
+- Basic accessibility hints are not a substitute for a real accessibility audit.
+- The extension cannot run on Chrome internal pages, Chrome Web Store pages, and some restricted documents.
+- Time remaining is an estimate based on current scroll distance and speed.
+- Resume position is stored locally and may be approximate if page layout changes.
 
-## 🤝 Contributing
+## Bug reports
 
-Contributions are welcome! Please follow these guidelines:
+Use GitHub Issues and include:
 
-1. Follow the coding standards in `.github/copilot-instructions.md`
-2. Test thoroughly on multiple websites
-3. Keep accessibility claims accurate and test keyboard/screen-reader behavior
-4. Keep the extension lightweight
+- browser and version,
+- extension version,
+- page URL or page type,
+- what you clicked or said,
+- expected behavior,
+- actual behavior,
+- whether the HUD, voice, Reading Focus, or custom scroll area was active.
 
-## 📝 License
+For debugging, use Options -> Advanced -> Copy Diagnostic Info.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## License
 
-## 🐛 Bug Reports & Feature Requests
-
-Please use GitHub Issues to report bugs or request features. Include:
-- Browser version
-- Website where the issue occurred
-- Steps to reproduce
-- Expected vs actual behavior
-
-## 🙏 Acknowledgments
-
-- **Web Speech API**: For browser-handled voice recognition
-- **Chrome Extension Team**: For the robust extension platform
-
-## 📊 Privacy
-
-ScrollHands Free respects your privacy:
-- No data collection or tracking
-- All settings stored locally in your browser
-- Microphone access is requested only when you enable voice commands
-- Voice recognition is handled by your browser
-- No analytics or telemetry
-
----
-
-**Made for calmer hands-free reading**
+MIT. See `LICENSE`.
