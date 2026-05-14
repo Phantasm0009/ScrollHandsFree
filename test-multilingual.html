@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScrollHandsFree Voice Command Test Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px 90px;
+    }
+
+    section {
+      margin: 32px 0;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    code {
+      background: #eef2ff;
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Voice Command Test Page</h1>
+    <p>This page is for manual voice-command testing. It does not run any test script and does not collect audio.</p>
+
+    <section>
+      <h2>Before testing</h2>
+      <ol>
+        <li>Load the extension in Chrome.</li>
+        <li>Open the popup on this page.</li>
+        <li>Enable Voice Commands.</li>
+        <li>Choose the voice language in Options if you are testing a non-default language.</li>
+        <li>Watch the popup or HUD for generic command feedback.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>English commands</h2>
+      <p>Try short phrases first:</p>
+      <p><code>start</code> <code>pause</code> <code>stop</code> <code>faster</code> <code>slower</code> <code>up</code> <code>down</code> <code>top</code> <code>bottom</code></p>
+    </section>
+
+    <section>
+      <h2>Focus commands</h2>
+      <p><code>focus on</code> <code>focus off</code> <code>bigger focus</code> <code>smaller focus</code></p>
+    </section>
+
+    <section>
+      <h2>Custom aliases</h2>
+      <p>Add a custom alias in Options, then say it on this page. The extension should match the alias without logging the spoken phrase to the console.</p>
+    </section>
+
+    <section>
+      <h2>Expected privacy behavior</h2>
+      <ul>
+        <li>The page should show only generic command feedback.</li>
+        <li>The console should not print recognized spoken phrases.</li>
+        <li>Microphone access should be optional and limited to voice commands.</li>
+        <li>Auto-scroll should still work if microphone permission is denied.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Long content</h2>
+      <p>Use this section to keep the page scrollable while testing voice commands. Repeat start, pause, faster, slower, and stop while observing the popup state.</p>
+      <p>The reading controls should continue to respond after tab switches, popup reopenings, and HUD hide/show changes.</p>
+      <p>At the end of the page, verify that the selected end behavior is respected.</p>
+    </section>
+  </main>
+</body>
+</html>

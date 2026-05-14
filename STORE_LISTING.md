@@ -17,7 +17,7 @@ Core features:
 - Optional voice commands for start, pause, stop, faster, slower, direction, top/bottom, and Reading Focus.
 - Custom voice aliases, disabled commands, and no-microphone command testing.
 - Smart scroll area detection for pages, nested containers, docs panes, recipes, and app layouts.
-- Page tools for choosing a scroll area, jumping to the next heading, jumping back one paragraph, and viewing basic accessibility hints.
+- Page tools for choosing a scroll area, jumping to the next heading, jumping back one paragraph, and viewing simple accessibility hints. These are basic checks only, not a WCAG audit or compliance guarantee.
 - Per-site preferences and resume positions stored locally.
 
 Privacy summary:

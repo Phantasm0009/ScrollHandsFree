@@ -239,7 +239,7 @@ The options page is organized into sections:
 - Voice: language, command aliases, disabled commands, command test, microphone/privacy note.
 - Reading Focus: default focus setting, band height, dim opacity, reading rhythm.
 - Sites: current-site block/speed/focus/HUD preferences.
-- Accessibility: basic accessibility notes and high-level support claims.
+- Accessibility: simple local page hints and clear non-WCAG wording.
 - Privacy: local data explanation, clear controls, import/export.
 - Advanced: keyboard shortcut information and diagnostics.
 - What's New: short changelog summary.
@@ -252,7 +252,8 @@ The options page is organized into sections:
 - `scripting`: inject `content.js` on demand.
 - `storage`: save local settings and per-site preferences.
 - `contextMenus`: provide right-click actions.
-- `optional_host_permissions` for `http://*/*` and `https://*/*`: reserved for persistent per-site behavior. Normal scrolling is user-triggered through active tab access.
+
+The extension does not currently request broad host permissions. Normal scrolling is user-triggered through active tab access.
 
 ### Data handling
 
@@ -269,6 +270,8 @@ ScrollHandsFree does not include:
 Settings and reading state are stored locally in the browser. Voice commands are handled through the browser's speech recognition API. ScrollHandsFree does not store audio, but browser speech recognition may be processed by the browser or platform provider.
 
 See `privacy.html` for the in-extension privacy policy text.
+
+See `MAINTAINABILITY.md` for the current module-splitting plan and performance cautions.
 
 ## Browser compatibility
 
@@ -309,6 +312,7 @@ ScrollHandsFree-main/
 |-- RECENT_UPDATES.md      # short update summary
 |-- STORE_LISTING.md       # store listing draft
 |-- MULTILINGUAL_VOICE_COMMANDS.md
+|-- MAINTAINABILITY.md     # module split and performance notes
 |-- icons/
 `-- README.md
 ```
@@ -316,6 +320,26 @@ ScrollHandsFree-main/
 ### Build
 
 No build process is required.
+
+### Maintainability note
+
+The current extension still uses large `background.js` and `content.js` files. That keeps the unpacked extension simple, but it is not the ideal long-term architecture. The next maintainability pass should split the code by responsibility:
+
+- scrolling engine,
+- scroll-area detection,
+- voice commands,
+- HUD,
+- Reading Focus,
+- accessibility hints,
+- diagnostics and storage.
+
+Because MV3 content scripts loaded through `chrome.scripting.executeScript` are not as straightforward as normal app modules, the safest path is to introduce a small build step or a deliberate multi-file injection plan before splitting `content.js`.
+
+### Performance notes
+
+The scroll engine uses `requestAnimationFrame` and time-based pixels-per-second movement. HUD/progress updates are throttled, and heading/content-break pause checks are throttled so they do not query the page on every animation frame.
+
+Still, complex sites can behave differently. Test heavy pages, infinite-scroll feeds, documentation apps with nested panes, and pages with animations before shipping a new release.
 
 ### Quick validation
 

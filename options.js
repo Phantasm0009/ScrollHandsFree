@@ -151,7 +151,7 @@
       }
 
       const response = await sendMessage({ command: 'getSettings' });
-      
+
       if (response?.success) {
         const settings = response.settings;
         populateForm(settings);
@@ -174,8 +174,8 @@
   function populateForm(settings) {
     try {
       defaultSpeed.value = settings.defaultSpeed || DEFAULT_SETTINGS.defaultSpeed;
-      
-      pauseAtHeadings.value = settings.pauseAtHeadings !== undefined ? 
+
+      pauseAtHeadings.value = settings.pauseAtHeadings !== undefined ?
         settings.pauseAtHeadings : DEFAULT_SETTINGS.pauseAtHeadings;
       smartPausing.checked = settings.smartPausing === true;
       autoPauseOnUserScroll.checked = settings.autoPauseOnUserScroll !== false;
@@ -232,9 +232,9 @@
       const settings = collectFormData();
 
       // Save settings
-      const response = await sendMessage({ 
-        command: 'saveSettings', 
-        settings: settings 
+      const response = await sendMessage({
+        command: 'saveSettings',
+        settings: settings
       });
 
       if (response?.success) {
@@ -317,7 +317,7 @@
       }
       return false;
     }
-    
+
     defaultSpeed.setCustomValidity('');
     return true;
   }
@@ -335,7 +335,7 @@
       }
       return false;
     }
-    
+
     pauseAtHeadings.setCustomValidity('');
     return true;
   }
@@ -642,7 +642,7 @@
     hideMessages();
     successMessage.textContent = message;
     successMessage.style.display = 'block';
-    
+
     // Auto-hide after 3 seconds
     setTimeout(() => {
       successMessage.style.display = 'none';
@@ -659,7 +659,7 @@
     hideMessages();
     errorMessage.textContent = message;
     errorMessage.style.display = 'block';
-    
+
     // Auto-hide after 5 seconds
     setTimeout(() => {
       errorMessage.style.display = 'none';
@@ -691,9 +691,9 @@
     announcement.style.height = '1px';
     announcement.style.overflow = 'hidden';
     announcement.textContent = message;
-    
+
     document.body.appendChild(announcement);
-    
+
     // Remove after announcement
     setTimeout(() => {
       document.body.removeChild(announcement);

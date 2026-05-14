@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScrollHandsFree Manual Test Page</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    body {
+      margin: 0;
+      line-height: 1.65;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    h1,
+    h2 {
+      line-height: 1.2;
+    }
+
+    .panel {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      margin: 24px 0;
+    }
+
+    .scroll-pane {
+      max-height: 320px;
+      overflow: auto;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ScrollHandsFree Manual Test Page</h1>
+    <p>This page exists so the extension can be tested on predictable long-form content without relying on a third-party website.</p>
+
+    <section class="panel">
+      <h2>Checklist</h2>
+      <ul>
+        <li>Start, pause, resume, and stop scrolling.</li>
+        <li>Try Slow, Reading, Fast, and Skim speed presets.</li>
+        <li>Toggle Reading Focus.</li>
+        <li>Enable the on-page HUD and drag it.</li>
+        <li>Use Jump to next heading and Back one paragraph.</li>
+        <li>Try Choose scroll area on the nested panel below.</li>
+      </ul>
+    </section>
+
+    <h2>Article section one</h2>
+    <p>Hands-free scrolling should feel predictable. The page should move at a steady pace, pause when requested, and stop cleanly at the end. A good reading tool should never fight the user.</p>
+    <p>The popup should reflect the active tab. If you switch tabs and come back, the status should still make sense for this page.</p>
+    <p>Reading Focus should dim the surrounding content without covering text or making the page feel heavy.</p>
+
+    <h2>Nested scroll area</h2>
+    <p>Use Choose scroll area, then click inside this panel. The extension should scroll this panel rather than the full page.</p>
+    <div class="scroll-pane" tabindex="0" aria-label="Nested scroll area for testing">
+      <h3>Nested heading one</h3>
+      <p>This is nested content inside an overflow container. It should help test smart scroll-area detection.</p>
+      <p>Documentation sites and web apps often use this kind of layout, with a sidebar or fixed frame around the main reading pane.</p>
+      <h3>Nested heading two</h3>
+      <p>The selected container should keep moving while the outer page stays mostly still.</p>
+      <p>If this panel does not scroll, use the context menu action to choose the scroll area again.</p>
+      <h3>Nested heading three</h3>
+      <p>Progress and estimated time remaining should update while this panel scrolls.</p>
+      <p>End-of-container behavior should match the selected end behavior in the popup.</p>
+      <h3>Nested heading four</h3>
+      <p>This is the final nested section. The panel is intentionally long enough to exercise the scroll engine.</p>
+    </div>
+
+    <h2>Article section two</h2>
+    <p>Manual scrolling should temporarily pause auto-scroll when that option is enabled. This makes the extension feel cooperative instead of stubborn.</p>
+    <p>Heading pauses should trigger near visible section headings, but they should not repeat constantly on the same heading.</p>
+    <p>Time remaining is an estimate based on scrollable distance and current speed, so small layout changes can affect it.</p>
+
+    <h2>Article section three</h2>
+    <p>Voice commands are optional. If enabled, test short phrases such as start, pause, stop, faster, slower, up, down, top, bottom, focus on, and focus off.</p>
+    <p>The console should not print recognized spoken phrases. Privacy-sensitive feedback should stay generic.</p>
+    <p>The extension should still work without microphone permission.</p>
+
+    <h2>End of page</h2>
+    <p>This is the bottom of the manual test page. Verify that reached-end behavior, stop, loop, and reverse work as expected.</p>
+  </main>
+</body>
+</html>

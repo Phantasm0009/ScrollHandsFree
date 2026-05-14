@@ -163,18 +163,18 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   try {
     const existingSettings = await chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS));
     const settingsToSet = {};
-    
+
     // Only set defaults for missing settings
     for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
       if (!(key in existingSettings)) {
         settingsToSet[key] = value;
       }
     }
-    
+
     if (Object.keys(settingsToSet).length > 0) {
       await chrome.storage.local.set(settingsToSet);
     }
-    
+
     createContextMenus();
     if (details.reason === 'install') {
       chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') }).catch(() => {});
@@ -422,20 +422,20 @@ async function sendMessageToTab(tabId, message) {
     } catch (pingError) {
       // Content script not loaded, continue to injection
     }
-    
+
     // Content script is not loaded, inject it first
     console.log('Injecting content script for tab:', tabId);
     await chrome.scripting.executeScript({
       target: { tabId: tabId },
       files: ['content.js']
     });
-    
+
     // Wait a bit for the script to initialize
     await new Promise(resolve => setTimeout(resolve, 200));
-    
+
     // Try sending the message again
     return await chrome.tabs.sendMessage(tabId, { ...message, target: 'content' });
-    
+
   } catch (error) {
     console.error('Error in sendMessageToTab:', error);
     throw error;
@@ -1038,23 +1038,23 @@ async function handleToggleVoice(enabled, sendResponse) {
     const tab = await getActiveTab();
     if (tab?.id) {
       const tabId = tab.id;
-      
+
       // First disable voice commands on all other tabs.
       if (enabled) {
         await disableVoiceOnAllOtherTabs(tabId);
       }
-      
-      const response = await sendMessageToTab(tabId, { 
-        command: 'toggleVoice', 
+
+      const response = await sendMessageToTab(tabId, {
+        command: 'toggleVoice',
         enabled: enabled,
         tabSpecific: true // Flag to indicate tab-specific mode
       });
-      
+
       if (response?.success) {
         // Store voice state per tab instead of globally
         const tabVoiceStates = await chrome.storage.session.get(['tabVoiceStates']) || {};
         const currentTabStates = tabVoiceStates.tabVoiceStates || {};
-        
+
         if (enabled) {
           currentTabStates[tabId] = {
             enabled: true,
@@ -1065,7 +1065,7 @@ async function handleToggleVoice(enabled, sendResponse) {
         } else {
           delete currentTabStates[tabId];
         }
-        
+
         await chrome.storage.session.set({ tabVoiceStates: currentTabStates });
         const tabState = await getStoredTabState(tabId);
         const nextState = {
@@ -1098,59 +1098,59 @@ async function disableVoiceOnAllOtherTabs(excludeTabId) {
   try {
     const tabVoiceStates = await chrome.storage.session.get(['tabVoiceStates']) || {};
     const currentTabStates = tabVoiceStates.tabVoiceStates || {};
-    
+
     // Get all tabs that currently have voice enabled
     const enabledTabIds = Object.keys(currentTabStates);
     console.log(`Disabling voice on ${enabledTabIds.length} other tabs, excluding tab ${excludeTabId}`);
-    
+
     // Process tabs sequentially to avoid conflicts
     for (const tabIdStr of enabledTabIds) {
       const tabId = parseInt(tabIdStr);
       if (tabId !== excludeTabId) {
         try {
           console.log(`Disabling voice commands on tab ${tabId}`);
-          
+
           // Send disable command without injecting into pages that do not already have the content script.
-          await sendMessageToExistingContentScript(tabId, { 
-            command: 'toggleVoice', 
+          await sendMessageToExistingContentScript(tabId, {
+            command: 'toggleVoice',
             enabled: false,
             tabSpecific: true,
             forceStop: true // Flag to indicate forced stop
           });
-          
+
           // Remove from storage
           delete currentTabStates[tabId];
           console.log(`Successfully disabled voice on tab ${tabId}`);
-          
+
         } catch (error) {
           console.warn(`Could not disable voice on tab ${tabId}:`, error.message);
           // Tab might be closed or not responding, just remove from storage
           delete currentTabStates[tabId];
         }
-        
+
         // Small delay between tabs to prevent conflicts
         await new Promise(resolve => setTimeout(resolve, 100));
       }
     }
-    
+
     // Update storage with cleaned state
     await chrome.storage.session.set({ tabVoiceStates: currentTabStates });
     console.log('Voice commands cleanup completed');
-    
+
   } catch (error) {
     console.error('Error disabling voice on other tabs:', error);
   }
 }
 
 /**
- * Check accessibility on active tab
+ * Show basic accessibility hints on active tab
  */
 async function handleAccessibilityCheck(sendResponse) {
   try {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs[0]?.id) {
       const response = await sendMessageToTab(tabs[0].id, { command: 'checkAccessibility' });
-      
+
       if (response?.success) {
         sendResponse({ success: true });
       } else {
@@ -1176,7 +1176,7 @@ async function handleGetSettings(sendResponse) {
     const tabState = tab?.id ? await getStoredTabState(tab.id) : normalizeTabState({}, settings);
     const lastPositions = settings[STORAGE_KEYS.LAST_POSITIONS] || {};
     const resumePosition = tab?.url ? lastPositions[tab.url] : null;
-    
+
     sendResponse({
       success: true,
       settings,
@@ -1248,12 +1248,12 @@ async function handleSaveSettings(settings, sendResponse) {
 }
 
 /**
- * Handle accessibility report from content script
+ * Handle basic accessibility hint report from content script
  */
 function handleAccessibilityReport(data) {
   try {
     // Store the report for popup to display
-    chrome.storage.session.set({ 
+    chrome.storage.session.set({
       accessibilityReport: data,
       reportTimestamp: Date.now()
     });
@@ -1265,9 +1265,9 @@ function handleAccessibilityReport(data) {
       console.log(`Accessibility check completed for ${data.url}`);
       console.log(`Found ${data.violations.length} violations`);
       console.log(`Passed ${data.passes.length} checks`);
-      
+
       if (data.violations.length > 0) {
-        console.group('Accessibility Violations:');
+        console.group('Basic accessibility hints:');
         data.violations.forEach(violation => {
           console.warn(`${violation.id}: ${violation.description} (Impact: ${violation.impact})`);
         });
@@ -1276,14 +1276,14 @@ function handleAccessibilityReport(data) {
     }
 
     // Create notification for user
-    const message = data.error 
+    const message = data.error
       ? 'Accessibility check failed'
       : data.violations.length === 0
-        ? 'No accessibility issues found!'
-        : `Found ${data.violations.length} accessibility issue${data.violations.length === 1 ? '' : 's'}`;
+        ? 'No basic accessibility hints found. This is not a full WCAG audit.'
+        : `Found ${data.violations.length} basic accessibility hint${data.violations.length === 1 ? '' : 's'}. This is not a full WCAG audit.`;
 
     console.log('Accessibility Report:', message);
-    
+
   } catch (error) {
     console.error('Error handling accessibility report:', error);
   }
@@ -1319,7 +1319,7 @@ function handleVoiceCommandFeedback(commandText, success, feedback) {
     }).catch(() => {
       // Popup might not be open, ignore error
     });
-    
+
   } catch (error) {
     console.error('Error handling voice command feedback:', error);
   }
@@ -1586,7 +1586,7 @@ function handleVoiceStatusUpdate(status, enabled, tabId) {
     const statusText = toDisplayText(status, enabled ? 'Listening' : 'Off');
     const isEnabled = Boolean(enabled);
     console.log(`Voice status update: ${statusText}, enabled: ${isEnabled}`);
-    
+
     // Store voice status for popup
     chrome.storage.session.set({
       voiceStatus: statusText,
@@ -1618,7 +1618,7 @@ function handleVoiceStatusUpdate(status, enabled, tabId) {
         });
       }).catch(() => {});
     }
-    
+
   } catch (error) {
     console.error('Error handling voice status update:', error);
   }
@@ -1633,7 +1633,7 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
     const currentTabStates = tabVoiceStates.tabVoiceStates || {};
     const tabScrollStatesResult = await chrome.storage.session.get(['tabScrollStates']) || {};
     const tabScrollStates = tabScrollStatesResult.tabScrollStates || {};
-    
+
     if (currentTabStates[tabId]) {
       delete currentTabStates[tabId];
       await chrome.storage.session.set({ tabVoiceStates: currentTabStates });
@@ -1661,7 +1661,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
       const currentTabStates = tabVoiceStates.tabVoiceStates || {};
       const tabScrollStatesResult = await chrome.storage.session.get(['tabScrollStates']) || {};
       const tabScrollStates = tabScrollStatesResult.tabScrollStates || {};
-      
+
       if (currentTabStates[tabId]) {
         await sendMessageToExistingContentScript(tabId, {
           command: 'toggleVoice',

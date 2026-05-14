@@ -52,6 +52,8 @@
   let hudDragState = null;
   let lastMiniControllerReveal = 0;
   let lastRealtimeStateSent = 0;
+  let lastHeadingPauseCheck = 0;
+  let lastContentBreakCheck = 0;
   let pausedHeadingElements = new WeakSet();
   let pausedBreakElements = new WeakSet();
   let autoPauseResumeTimer = null;
@@ -66,6 +68,10 @@
     fast: 75,
     skim: 100
   };
+
+  const HEADING_PAUSE_CHECK_INTERVAL_MS = 350;
+  const CONTENT_BREAK_CHECK_INTERVAL_MS = 500;
+  const MAX_PAUSE_CANDIDATES = 350;
 
   const READING_MODE_PRESETS = {
     custom: {
@@ -187,7 +193,7 @@
       action: () => pauseAutoScroll(),
       feedback: 'Paused scrolling'
     },
-    
+
     // Stop Commands
     stop: {
       patterns: {
@@ -211,7 +217,7 @@
       action: () => stopAutoScroll(),
       feedback: 'Stopped scrolling'
     },
-    
+
     // Direction - Up
     up: {
       patterns: {
@@ -235,7 +241,7 @@
       action: () => startAutoScroll(currentSpeed, -1),
       feedback: 'Scrolling up'
     },
-    
+
     // Direction - Down
     down: {
       patterns: {
@@ -259,7 +265,7 @@
       action: () => startAutoScroll(currentSpeed, 1),
       feedback: 'Scrolling down'
     },
-    
+
     // Speed Control - Faster
     faster: {
       patterns: {
@@ -286,7 +292,7 @@
         return `Speed increased to ${newSpeed}%`;
       }
     },
-    
+
     // Speed Control - Slower
     slower: {
       patterns: {
@@ -313,7 +319,7 @@
         return `Speed decreased to ${newSpeed}%`;
       }
     },
-    
+
     // Navigation - Top
     top: {
       patterns: {
@@ -341,7 +347,7 @@
         return 'Jumped to top';
       }
     },
-    
+
     // Navigation - Bottom
     bottom: {
       patterns: {
@@ -369,7 +375,7 @@
         return 'Jumped to bottom';
       }
     },
-    
+
     // Max Speed
     turbo: {
       patterns: {
@@ -395,7 +401,7 @@
         return 'Maximum speed activated';
       }
     },
-    
+
     // Help
     help: {
       patterns: {
@@ -418,7 +424,7 @@
       },
       action: () => showHelpPopup()
     },
-    
+
     // Status
     speed: {
       patterns: {
@@ -441,7 +447,7 @@
       },
       action: () => `Current speed: ${currentSpeed}%`
     },
-    
+
     position: {
       patterns: {
         'en': ['where am I', 'current position', 'page position'],
@@ -501,7 +507,7 @@
     // Try to detect user's preferred language
     const browserLang = navigator.language || navigator.userLanguage || 'en';
     const langCode = browserLang.split('-')[0].toLowerCase();
-    
+
     // Check if we support this language
     if (SUPPORTED_LANGUAGE_CODES.includes(langCode)) {
       detectedLanguage = langCode;
@@ -826,7 +832,7 @@
         background: rgba(0, 0, 0, 0.95);
         border: 2px solid #ffffff;
       }
-      
+
       .scrollhands-voice-feedback {
         background: rgba(0, 0, 0, 0.95);
         border: 1px solid #ffffff;
@@ -861,10 +867,10 @@
       initializeVoiceRecognition();
       setupMessageListener();
       setupPageLifecycleVoiceCleanup();
-      
+
       // Auto-enable voice commands if they were previously enabled
       checkAndRestoreVoiceControl();
-      
+
       console.log('ScrollHands Free content script initialized');
     } catch (error) {
       console.error('Error initializing ScrollHands Free:', error);
@@ -1903,17 +1909,22 @@
     return window.innerHeight * 0.42;
   }
 
-  function maybePauseAtHeading() {
+  function maybePauseAtHeading(timestamp = performance.now()) {
     if (!autoPauseAtHeadings || headingPauseSeconds <= 0 || !isScrolling) {
       return;
     }
 
-    if (performance.now() - scrollStartedAt < 700) {
+    if (timestamp - scrollStartedAt < 700) {
       return;
     }
 
+    if (timestamp - lastHeadingPauseCheck < HEADING_PAUSE_CHECK_INTERVAL_MS) {
+      return;
+    }
+    lastHeadingPauseCheck = timestamp;
+
     const headingRoot = scrollTarget && !isDocumentScrollTarget(scrollTarget) ? scrollTarget : document;
-    const headings = headingRoot.querySelectorAll('h1, h2, h3, h4, [role="heading"]');
+    const headings = Array.from(headingRoot.querySelectorAll('h1, h2, h3, h4, [role="heading"]')).slice(0, MAX_PAUSE_CANDIDATES);
     const bandY = getReadingBandY();
 
     for (const heading of headings) {
@@ -1937,20 +1948,25 @@
     }
   }
 
-  function maybePauseAtContentBreak() {
+  function maybePauseAtContentBreak(timestamp = performance.now()) {
     if (readingRhythm === 'smooth' || !isScrolling) {
       return;
     }
 
-    if (performance.now() - scrollStartedAt < 1200) {
+    if (timestamp - scrollStartedAt < 1200) {
       return;
     }
+
+    if (timestamp - lastContentBreakCheck < CONTENT_BREAK_CHECK_INTERVAL_MS) {
+      return;
+    }
+    lastContentBreakCheck = timestamp;
 
     const root = scrollTarget && !isDocumentScrollTarget(scrollTarget) ? scrollTarget : document;
     const selector = readingRhythm === 'deliberate'
       ? 'p, figure, img, video, form, table, blockquote'
       : 'figure, video, form, table, blockquote';
-    const candidates = root.querySelectorAll(selector);
+    const candidates = Array.from(root.querySelectorAll(selector)).slice(0, MAX_PAUSE_CANDIDATES);
     const bandY = getReadingBandY();
     const pauseSeconds = readingRhythm === 'deliberate' ? 1.4 : 0.8;
 
@@ -2077,11 +2093,11 @@
     }
 
     if (isScrolling) {
-      maybePauseAtHeading();
+      maybePauseAtHeading(timestamp);
     }
 
     if (isScrolling) {
-      maybePauseAtContentBreak();
+      maybePauseAtContentBreak(timestamp);
     }
 
     if (isScrolling) {
@@ -2130,6 +2146,8 @@
       scrollLastFrameTime = null;
       scrollRemainder = 0;
       scrollStartedAt = performance.now();
+      lastHeadingPauseCheck = 0;
+      lastContentBreakCheck = 0;
       notifyScrollState(scrollDirection > 0 ? 'Scrolling down' : 'Scrolling up');
       scrollFrameId = requestAnimationFrame(stepAutoScroll);
 
@@ -2423,20 +2441,20 @@
     try {
       // Check if speech recognition is available
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      
+
       if (!SpeechRecognition) {
         console.warn('Speech recognition not supported in this browser');
         return;
       }
 
       recognition = new SpeechRecognition();
-      
+
       // Enhanced configuration for better accuracy
       recognition.continuous = true;
       recognition.lang = applyVoiceLanguage(voiceLanguage);
       recognition.interimResults = true; // Enable interim results for faster response
       recognition.maxAlternatives = 5; // Get more alternatives for better accuracy
-      
+
       // Set speech recognition grammar for better command recognition
       if ('webkitSpeechGrammarList' in window) {
         const grammar = '#JSGF V1.0; grammar commands; public <command> = start | stop | faster | slower | up | down | top | bottom | focus on | focus off | bigger focus | smaller focus | help | speed | turbo;';
@@ -2450,31 +2468,29 @@
           // Process both interim and final results for faster response
           for (let i = event.resultIndex; i < event.results.length; i++) {
             const result = event.results[i];
-            
+
             // Process multiple alternatives for better accuracy
             let bestCommand = null;
             let bestConfidence = 0;
-            
+
             for (let j = 0; j < result.length; j++) {
               const alternative = result[j];
               const command = alternative.transcript.trim().toLowerCase();
               const confidence = alternative.confidence || 0.8; // Default confidence
-              
+
               // Check if this command is recognizable and has good confidence
               if (confidence > bestConfidence && isRecognizableCommand(command)) {
                 bestCommand = command;
                 bestConfidence = confidence;
               }
             }
-            
+
             if (bestCommand) {
               if (result.isFinal) {
-                console.log(`Final voice command: "${bestCommand}" (confidence: ${bestConfidence})`);
                 processVoiceCommand(bestCommand, bestConfidence);
               } else {
                 // Process interim results for quick commands with high confidence
                 if (isQuickCommand(bestCommand) && bestConfidence > 0.7) {
-                  console.log(`Quick interim command: "${bestCommand}" (confidence: ${bestConfidence})`);
                   processVoiceCommand(bestCommand, bestConfidence);
                 }
               }
@@ -2504,7 +2520,7 @@
         } else {
           console.error('Speech recognition error:', speechError);
         }
-        
+
         // Handle specific errors gracefully
         switch (speechError) {
           case 'no-speech':
@@ -2552,7 +2568,7 @@
       recognition.onend = () => {
         console.log('Speech recognition ended');
         isRecognitionActive = false;
-        
+
         // Only restart if voice is still enabled and not manually stopped
         if (voiceRecognitionEnabled) {
           // Add a longer delay to prevent rapid restart cycles and conflicts
@@ -2568,7 +2584,7 @@
               console.warn('Error restarting voice recognition:', error);
               isRecognitionActive = false;
               voiceRestartFailures += 1;
-              
+
               // If restart fails, try one more time with even longer delay
               if (voiceRecognitionEnabled && voiceRestartFailures < 3) {
                 setTimeout(() => {
@@ -2628,37 +2644,37 @@
    */
   function isRecognizableCommand(command) {
     if (!command || typeof command !== 'string') return false;
-    
+
     const cleanCommand = command.trim().toLowerCase();
     for (const aliases of Object.values(customVoiceAliases || {})) {
       if (Array.isArray(aliases) && aliases.some(alias => cleanCommand.includes(String(alias).toLowerCase()))) {
         return true;
       }
     }
-    
+
     // Check against all language patterns in our multilingual commands
     for (const [commandKey, commandData] of Object.entries(MULTILINGUAL_VOICE_COMMANDS)) {
       for (const [lang, patterns] of Object.entries(commandData.patterns)) {
-        if (patterns.some(pattern => 
-          cleanCommand.includes(pattern.toLowerCase()) || 
+        if (patterns.some(pattern =>
+          cleanCommand.includes(pattern.toLowerCase()) ||
           pattern.toLowerCase().includes(cleanCommand)
         )) {
           return true;
         }
       }
     }
-    
+
     // Also check for numbers which might be part of commands
-    const numberWords = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 
+    const numberWords = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
       'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
       'один', 'два', 'три', 'четыре', 'пять', // Russian
-      'un', 'dos', 'tres', 'cuatro', 'cinco', // Spanish  
+      'un', 'dos', 'tres', 'cuatro', 'cinco', // Spanish
       'un', 'deux', 'trois', 'quatre', 'cinq', // French
       'eins', 'zwei', 'drei', 'vier', 'fünf', // German
       'uno', 'due', 'tre', 'quattro', 'cinque', // Italian
       'um', 'dois', 'três', 'quatro', 'cinco' // Portuguese
     ];
-    
+
     return numberWords.some(word => cleanCommand.includes(word));
   }
 
@@ -2691,17 +2707,15 @@
    */
   function processVoiceCommand(command, confidence = 0.8) {
     try {
-      console.log(`Processing voice command: "${command}" (confidence: ${confidence})`);
-      
       // Only process high-confidence commands or known quick commands
       if (confidence < 0.6 && !isQuickCommand(command)) {
-        console.log('Low confidence command ignored:', command);
+        console.log('Low confidence voice command ignored');
         return;
       }
-      
+
       // Normalize command for better matching
       const normalizedCommand = command.toLowerCase().trim();
-      lastVoiceCommandText = normalizedCommand;
+      lastVoiceCommandText = '';
 
       if (/^(focus on|reading focus on|focus mode on|focus)$/i.test(normalizedCommand)) {
         if (shouldProcessVoiceCommand('focusOn')) {
@@ -2740,12 +2754,12 @@
       if (speedMatch) {
         const action = speedMatch[1].toLowerCase();
         const value = parseInt(speedMatch[2], 10);
-        
+
         let newSpeed;
         // Check if it's a "set speed" command or a "faster/slower" command
         const isSetSpeed = ['speed', 'velocidad', 'vitesse', 'geschwindigkeit', 'velocità', 'velocidade', 'скорость', '速度', '속도', 'سرعة', 'गति', 'snelheid'].includes(action);
         const isFaster = ['faster', 'más rápido', 'plus vite', 'schneller', 'più veloce', 'mais rápido', 'быстрее', '速く', '快一点', '빠르게', 'أسرع', 'तेज़', 'sneller'].includes(action);
-        
+
         if (isSetSpeed) {
           newSpeed = Math.max(1, Math.min(100, value));
         } else if (isFaster) {
@@ -2753,14 +2767,15 @@
         } else {
           newSpeed = Math.max(1, value);
         }
-        
+
         const commandKey = isSetSpeed ? 'speed' : (isFaster ? 'faster' : 'slower');
         if (!shouldProcessVoiceCommand(commandKey)) {
           return;
         }
         setScrollSpeed(newSpeed);
+        lastVoiceCommandText = isSetSpeed ? 'speed' : (isFaster ? 'faster' : 'slower');
         notifyBackgroundScript('voiceFeedback', {
-          message: `Heard: "${normalizedCommand}"`,
+          message: `Command recognized: ${lastVoiceCommandText}`,
           commandType: 'success'
         });
         showVoiceFeedback(`Speed set to ${newSpeed}%`);
@@ -2771,20 +2786,21 @@
       const pauseMatch = normalizedCommand.match(/\b(?:pause|pausar|pause|pausieren|pausa|pausar|пауза|一時停止|暂停|일시정지|وقفة|विराम|pauzeren|wait|esperar|attendre|warten|aspettare|esperar|ждать|待つ|等待|기다리다|انتظر|प्रतीक्षा|wachten|hold|mantener|tenir|halten|tenere|segurar|держать|保持|유지|احتفظ|पकड़ना|vasthouden)(?:\s+(?:for\s+)?(\d+)(?:\s*(seconds?|segundos?|secondes?|sekunden?|secondi?|segundos?|секунд|秒|초|ثواني|सेकंड|seconden|minutes?|minutos?|minutes?|minuten?|minuti?|minutos?|минут|分|분|دقائق|मिनट|minuten|mins?))?)?/);
       if (pauseMatch && pauseMatch[1]) {
         let seconds = parseInt(pauseMatch[1], 10);
-        
+
         // Convert minutes to seconds
         if (pauseMatch[2] && (pauseMatch[2].includes('min') || pauseMatch[2].includes('分') || pauseMatch[2].includes('분') || pauseMatch[2].includes('دقائق') || pauseMatch[2].includes('मिनट'))) {
           seconds *= 60;
         }
-        
+
         if (isScrolling) {
           if (!shouldProcessVoiceCommand('pause')) {
             return;
           }
           temporarilyPauseAutoScroll(seconds, `Pausing for ${seconds} seconds`);
         }
+        lastVoiceCommandText = 'pause';
         notifyBackgroundScript('voiceFeedback', {
-          message: `Heard: "${normalizedCommand}"`,
+          message: 'Command recognized: pause',
           commandType: 'success'
         });
         showVoiceFeedback(`Pausing for ${seconds} seconds`);
@@ -2794,14 +2810,14 @@
       // Match against defined multilingual voice commands
       for (const [commandKey, commandData] of Object.entries(MULTILINGUAL_VOICE_COMMANDS)) {
         const languagePatterns = commandData.patterns;
-        
+
         // First try the active language, then fallback command dictionaries.
         const languagesToTry = [detectedLanguage, ...Object.keys(languagePatterns)];
-        
+
         let matchFound = false;
         for (const lang of languagesToTry) {
           if (!languagePatterns[lang]) continue;
-          
+
           const patterns = [...languagePatterns[lang], ...getVoiceAliases(commandKey)];
           matchFound = patterns.some(pattern => {
             const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -2810,20 +2826,21 @@
             const inclusionMatch = normalizedCommand.includes(pattern.toLowerCase());
             return wordBoundaryRegex.test(normalizedCommand) || inclusionMatch;
           });
-          
+
           if (matchFound) {
             console.log(`Matched "${commandKey}" command in language "${lang}"`);
             break;
           }
         }
-        
+
         if (matchFound) {
           try {
             if (!shouldProcessVoiceCommand(commandKey)) {
               return;
             }
+            lastVoiceCommandText = commandKey;
             notifyBackgroundScript('voiceFeedback', {
-              message: `Heard: "${commandKey}"`,
+              message: `Command recognized: ${commandKey}`,
               commandType: 'success'
             });
             const result = commandData.action();
@@ -2842,8 +2859,8 @@
 
       // If no command matched, show help
       showVoiceFeedback("I didn't catch a ScrollHandsFree command. Try 'start,' 'stop,' or 'slower.'", 'error');
-      console.log('Unrecognized voice command:', normalizedCommand);
-      
+      console.log('Unrecognized voice command');
+
     } catch (error) {
       console.error('Error processing voice command:', error);
       showVoiceFeedback('Error processing voice command', 'error');
@@ -2869,7 +2886,7 @@
       if (enabled && !voiceRecognitionEnabled) {
         // Enable voice recognition
         voiceRecognitionEnabled = true;
-        
+
         // Force stop any existing recognition first to prevent conflicts
         if (isRecognitionActive) {
           try {
@@ -2889,17 +2906,17 @@
               recognition.start();
               showVoiceFeedback('Voice commands are active for this tab.', 'info');
               console.log('Voice recognition started for this tab');
-              
+
               // Save voice enabled state for persistence across pages
               saveVoiceState(true);
-              
+
               // Notify background script if available
               notifyBackgroundScript('voiceStatusUpdate', {
                 status: 'Voice commands are active for this tab.',
                 enabled: true
               });
               notifyScrollState('Voice commands are active for this tab.');
-              
+
             } catch (error) {
               console.error('Error starting voice recognition:', error);
               isRecognitionActive = false;
@@ -2908,28 +2925,28 @@
             }
           }
         }, 200); // Increased delay to ensure proper cleanup
-        
+
       } else if (!enabled && voiceRecognitionEnabled) {
         // Disable voice recognition
         voiceRecognitionEnabled = false;
-        
+
         if (isRecognitionActive) {
           try {
             recognition.stop();
             isRecognitionActive = false;
             showVoiceFeedback('Voice commands disabled', 'info');
             console.log('Voice recognition stopped');
-            
+
             // Save voice disabled state
             saveVoiceState(false);
-            
+
             // Notify background script if available
             notifyBackgroundScript('voiceStatusUpdate', {
               status: 'Voice commands off',
               enabled: false
             });
             notifyScrollState('Voice commands off');
-            
+
           } catch (error) {
             console.error('Error stopping voice recognition:', error);
           }
@@ -2974,11 +2991,11 @@
   }
 
   /**
-   * Check accessibility using built-in checks
+   * Show basic accessibility hints using lightweight local checks.
    */
   async function checkAccessibility() {
     try {
-      console.log('Running built-in accessibility check...');
+      console.log('Running basic accessibility hint checks...');
       const results = runAccessibilityChecks();
 
       // Send results to background script
@@ -2989,10 +3006,10 @@
       });
 
       console.log('Accessibility check completed:', results);
-      
+
       // Show summary in console
       if (results.violations.length > 0) {
-        console.warn(`Found ${results.violations.length} accessibility issues`);
+        console.warn(`Found ${results.violations.length} basic accessibility hint${results.violations.length === 1 ? '' : 's'}`);
         results.violations.forEach(violation => {
           console.warn(`- ${violation.description}`, violation.nodes);
         });
@@ -3002,7 +3019,7 @@
 
     } catch (error) {
       console.error('Error running accessibility check:', error);
-      
+
       // Send error report
       chrome.runtime.sendMessage({
         target: 'background',
@@ -3057,7 +3074,7 @@
   function checkMissingAltText() {
     const violations = [];
     const images = document.querySelectorAll('img');
-    
+
     images.forEach((img, index) => {
       if (!img.alt && !img.getAttribute('aria-label') && !img.getAttribute('aria-labelledby')) {
         violations.push({
@@ -3081,7 +3098,7 @@
   function checkMissingHeadings() {
     const violations = [];
     const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    
+
     if (headings.length === 0) {
       violations.push({
         id: 'page-has-heading-one',
@@ -3126,15 +3143,15 @@
    */
   function checkColorContrast() {
     const violations = [];
-    
+
     // Simple check for very light text on light backgrounds
     const textElements = document.querySelectorAll('p, span, div, a, button, input, label');
-    
+
     textElements.forEach((element, index) => {
       const styles = window.getComputedStyle(element);
       const color = styles.color;
       const backgroundColor = styles.backgroundColor;
-      
+
       // Basic check for very light colors (this is simplified)
       if (color.includes('rgb(255, 255, 255)') && backgroundColor.includes('rgb(255, 255, 255)')) {
         violations.push({
@@ -3158,12 +3175,12 @@
   function checkFormLabels() {
     const violations = [];
     const inputs = document.querySelectorAll('input, select, textarea');
-    
+
     inputs.forEach((input, index) => {
       const hasLabel = input.labels && input.labels.length > 0;
       const hasAriaLabel = input.getAttribute('aria-label');
       const hasAriaLabelledby = input.getAttribute('aria-labelledby');
-      
+
       if (!hasLabel && !hasAriaLabel && !hasAriaLabelledby && input.type !== 'hidden' && input.type !== 'submit') {
         violations.push({
           id: 'label',
@@ -3186,7 +3203,7 @@
   function checkKeyboardAccessibility() {
     const violations = [];
     const interactiveElements = document.querySelectorAll('a, button, input, select, textarea, [tabindex]');
-    
+
     interactiveElements.forEach((element, index) => {
       // Check if interactive elements are keyboard accessible
       const tabindex = element.getAttribute('tabindex');
@@ -3212,11 +3229,11 @@
   function checkAriaAttributes() {
     const violations = [];
     const elementsWithAria = document.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby], [role]');
-    
+
     elementsWithAria.forEach((element, index) => {
       const ariaLabelledby = element.getAttribute('aria-labelledby');
       const ariaDescribedby = element.getAttribute('aria-describedby');
-      
+
       // Check if referenced elements exist
       if (ariaLabelledby && !document.getElementById(ariaLabelledby)) {
         violations.push({
@@ -3229,7 +3246,7 @@
           }]
         });
       }
-      
+
       if (ariaDescribedby && !document.getElementById(ariaDescribedby)) {
         violations.push({
           id: 'aria-valid-attr-value',
@@ -3251,7 +3268,7 @@
    */
   function checkPageStructure() {
     const violations = [];
-    
+
     // Check for main landmark
     const main = document.querySelector('main, [role="main"]');
     if (!main) {
@@ -3291,12 +3308,12 @@
     console.log('Testing multilingual voice commands...');
     console.log('Detected language:', detectedLanguage);
     console.log('Available languages in MULTILINGUAL_VOICE_COMMANDS:');
-    
+
     Object.keys(MULTILINGUAL_VOICE_COMMANDS).forEach(command => {
       const languages = Object.keys(MULTILINGUAL_VOICE_COMMANDS[command].patterns);
       console.log(`${command}: ${languages.join(', ')}`);
     });
-    
+
     // Test a few commands in different languages
     const testCommands = [
       'start', // English
@@ -3306,11 +3323,10 @@
       '开始', // Chinese
       'शुरू करें' // Hindi
     ];
-    
-    testCommands.forEach(cmd => {
-      console.log(`Testing command: "${cmd}"`);
+
+    testCommands.forEach((cmd, index) => {
       const recognized = isRecognizableCommand(cmd);
-      console.log(`Recognized: ${recognized}`);
+      console.log(`Test command ${index + 1}: ${recognized ? 'recognized' : 'not recognized'}`);
     });
   };
 
